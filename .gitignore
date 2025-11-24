@@ -8,7 +8,6 @@
 *.zip
 *.tar.gz
 *.rar
-*.java
 hs_err_pid*
 replay_pid*
 
@@ -17,8 +16,6 @@ target/
 build/
 out/
 
-# Sources
-src/main/java/
 
 # IDEs
 .idea/
