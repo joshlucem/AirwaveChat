@@ -1,7 +1,6 @@
 
 # AirwaveChat - Customizable messages file
 # You can edit these messages to fit your server.
-# Variables: {frequency}, {count}, {player}, {message}, {total}
 
 # --- General & Permissions ---
 only_players: "&cOnly players can use this command."
@@ -65,6 +64,5 @@ airwavechat_help_admin:
   - "&a/frequencies top &7- Show top frequencies by users."
 
 # --- Miscellaneous & Info ---
-plugin_info: "&bAirwaveChat &7- &eRadio Chat Plugin by YourName. Version: {version}"
 unknown_command: "&cUnknown command. Type /airwavechat help for help."
 invalid_arguments: "&cInvalid arguments. Please check the command usage."
