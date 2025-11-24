@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/discord/1435701600445399177?label=Join%20Discord&logo=discord&color=5865F2" alt="Discord" />
   </a>
   <br>
-  <a href="https://github.com/joshlucem/AirwaveChat/releases/latest">
+  <a href="https://github.com/joshlucem/AirwaveChat/releases">
     <img src="https://img.shields.io/github/v/release/joshlucem/AirwaveChat?label=Latest%20Release&logo=github" alt="Latest Release" />
   </a>
 </div>
@@ -17,7 +17,7 @@
 ---
 
 ## Download
-You can always download the latest version of AirwaveChat from the [Releases page](https://github.com/joshlucem/AirwaveChat/releases/latest).
+You can always download the latest version of AirwaveChat from the [Releases page](https://github.com/joshlucem/AirwaveChat/releases).
 
 ## Features
 - Private chat by configurable frequencies
