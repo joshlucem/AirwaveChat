@@ -1,3 +1,39 @@
+
+# Java/Maven
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+*.java
+hs_err_pid*
+replay_pid*
+
+# Build output
 target/
-#src/main/java
+build/
+out/
+
+# Sources
+src/main/java/
+
+# IDEs
+.idea/
 .vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Others
+*.log
+*.swp
+*.swo
+node_modules/
