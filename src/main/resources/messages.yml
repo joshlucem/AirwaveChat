@@ -1,0 +1,70 @@
+
+# AirwaveChat - Customizable messages file
+# You can edit these messages to fit your server.
+# Variables: {frequency}, {count}, {player}, {message}, {total}
+
+# --- General & Permissions ---
+only_players: "&cOnly players can use this command."
+no_permission: "&cYou do not have permission to use this command."
+reload_success: "&aAirwaveChat config, messages and frequencies reloaded!"
+reload_failed: "&cFailed to reload AirwaveChat. Check console for details."
+usage_airwavechat: "&eUsage: /airwavechat <reload|about|help>"
+
+# --- Frequencies Command ---
+frequencies_total: "&aTotal available frequencies: &b{total}"
+frequencies_list_header: "&aAvailable frequencies (first 50):"
+frequencies_none_available: "&cNo frequencies available."
+frequencies_info: "&aFrequency &b{frequency}&a has &e{count} &auser(s) connected."
+frequencies_current: "&aCurrent frequency: &b{frequency}&a. Users in frequency: &e{count}"
+frequencies_none: "&eYou are not connected to any frequency."
+frequencies_usage: "&eUsage: /frequencies [list|current|info <frequency>|top]"
+
+# --- Frequencies Paging Errors ---
+frequencies_page_invalid: "&cPage number must be 1 or higher."
+frequencies_page_nan: "&cPage number must be a valid number."
+frequencies_page_too_high: "&cPage number too high. Max page: &e{max}"
+
+# --- Frequencies Top ---
+frequencies_top_header: "&aTop frequencies by users:"
+frequencies_top_none: "&cNo users connected to any frequency."
+
+# --- Connect/Disconnect ---
+connect_success: "&aConnected to &b{frequency}&a. Users in frequency: &e{count}"
+connect_already: "&eYou are already on that frequency."
+connect_invalid: "&cInvalid frequency."
+connect_out_of_range: "&cFrequency out of range."
+connect_usage: "&eUsage: /connect <frequency>"
+disconnect_success: "&aDisconnected from frequency."
+disconnect_not_connected: "&eYou were not connected to any frequency."
+disconnect_usage: "&eUsage: /disconnect"
+
+# --- Chat Format ---
+chat_format: "&b[{frequency}] &a{player}: &f{message}"
+
+# --- AirwaveChat Help (User) ---
+airwavechat_help_user:
+  - "&bAirwaveChat &7- &eUser Commands Help"
+  - "&a/connect <frequency> &7- Connect to a frequency."
+  - "&a/disconnect &7- Disconnect from your current frequency."
+  - "&a/frequencies list &7- List available frequencies."
+  - "&a/frequencies current &7- Show your current frequency."
+  - "&a/frequencies info <frequency> &7- Show info for a frequency."
+  - "&a/frequencies top &7- Show top frequencies by users."
+
+# --- AirwaveChat Help (Admin) ---
+airwavechat_help_admin:
+  - "&bAirwaveChat &7- &eAdmin Commands Help"
+  - "&a/airwavechat reload &7- Reload config, messages and frequencies."
+  - "&a/airwavechat about &7- Show plugin information."
+  - "&a/airwavechat help &7- Show this help message."
+  - "&a/connect <frequency> &7- Connect to a frequency."
+  - "&a/disconnect &7- Disconnect from your current frequency."
+  - "&a/frequencies list &7- List available frequencies."
+  - "&a/frequencies current &7- Show your current frequency."
+  - "&a/frequencies info <frequency> &7- Show info for a frequency."
+  - "&a/frequencies top &7- Show top frequencies by users."
+
+# --- Miscellaneous & Info ---
+plugin_info: "&bAirwaveChat &7- &eRadio Chat Plugin by YourName. Version: {version}"
+unknown_command: "&cUnknown command. Type /airwavechat help for help."
+invalid_arguments: "&cInvalid arguments. Please check the command usage."

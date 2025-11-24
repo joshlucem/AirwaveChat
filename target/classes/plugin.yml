@@ -1,0 +1,26 @@
+main: com.joshlucem.airwavechat.AirwaveChat
+api: spigot
+name: AirwaveChat
+version: 1.0.0
+author: joshlucem
+description: "AirwaveChat - A customizable radio frequency chat plugin for Minecraft servers."
+api-version: 1.20
+commands:
+  connect:
+    description: Connect to a radio frequency.
+    usage: /connect <frequency>
+  disconnect:
+    description: Leave your current radio frequency.
+    usage: /disconnect
+  frequencies:
+    description: Show the total number of available frequencies.
+    usage: /frequencies [list|current|info <frequency>|top]
+  airwavechat:
+    description: Reload AirwaveChat config/messages or show plugin info.
+    usage: /airwavechat <reload|about|help>
+    aliases:
+      - awc
+      - awchat
+      - airchat
+    permission: airwavechat.admin
+    permission-message: You do not have permission to reload AirwaveChat.

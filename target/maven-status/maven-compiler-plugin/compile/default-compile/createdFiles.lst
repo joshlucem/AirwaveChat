@@ -1,0 +1,8 @@
+com\joshlucem\airwavechat\commands\FrequenciesCommand.class
+com\joshlucem\airwavechat\listeners\FrequencyChatListener.class
+com\joshlucem\airwavechat\manager\FrequencyManager.class
+com\joshlucem\airwavechat\AirwaveChat.class
+com\joshlucem\airwavechat\commands\ConnectCommand.class
+com\joshlucem\airwavechat\util\MessageUtil.class
+com\joshlucem\airwavechat\commands\AirwaveChatCommand.class
+com\joshlucem\airwavechat\commands\DisconnectCommand.class

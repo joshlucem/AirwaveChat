@@ -1,0 +1,21 @@
+# AirwaveChat - Main configuration file
+#
+# Frequency limits:
+# The number of available frequencies is calculated as:
+#   (max - min) / step + 1
+# The maximum allowed is 100,000 frequencies. If you exceed this, only the first 100,000 will be used.
+#
+# Examples:
+#   min: 0.1, max: 10.0, step: 0.1   -> 100 frequencies
+#   min: 0.1, max: 100.0, step: 0.1   -> 1,000 frequencies
+#   min: 0.1, max: 10,000.0, step: 0.1 -> 100,000 frequencies (limit)
+#
+# Adjust these values to set the allowed frequency range and step for radio chat.
+
+frequency:
+  # Minimum allowed frequency (inclusive)
+  min: 0.1
+  # Maximum allowed frequency (inclusive)
+  max: 10.0
+  # Step size for frequency selection (e.g., 0.1 means 0.1, 0.2, 0.3, ...)
+  step: 0.1
