@@ -26,7 +26,6 @@ public class FrequencyManager {
         max = plugin.getConfig().getDouble("frequency.max");
         step = plugin.getConfig().getDouble("frequency.step");
         validFrequencies = generateFrequencies(min, max, step);
-        // loadFrequencies() should be called explicitly after construction
     }
 
     public void reloadFrequenciesFromConfig() {

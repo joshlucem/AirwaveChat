@@ -32,7 +32,7 @@ public class AirwaveChat extends JavaPlugin {
         getCommand("disconnect").setTabCompleter(new DisconnectCommand());
         getCommand("airwavechat").setExecutor(new com.joshlucem.airwavechat.commands.AirwaveChatCommand());
         getCommand("airwavechat").setTabCompleter(new com.joshlucem.airwavechat.commands.AirwaveChatCommand());
-        // /about command removed; now handled by /airwavechat about
+
         Bukkit.getPluginManager().registerEvents(new FrequencyChatListener(), this);
         sendConsoleSignature();
         getLogger().info("AirwaveChat v1.0.0 currently enabled - Developed by @joshlucem");
@@ -40,7 +40,6 @@ public class AirwaveChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // No persistence needed
     }
 
     private void sendConsoleSignature() {

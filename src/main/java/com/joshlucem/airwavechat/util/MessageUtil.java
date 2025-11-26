@@ -10,6 +10,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.joshlucem.airwavechat.AirwaveChat;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+
 public class MessageUtil {
     private static final Map<String, Object> messages = new HashMap<>();
 
@@ -45,8 +48,10 @@ public class MessageUtil {
         }
         return List.of(String.valueOf(value));
     }
-
     public static String color(String msg) {
-        return msg.replaceAll("&([0-9a-fk-or])", "§$1");
+        if (msg == null) return "";
+        // Use MiniMessage to parse color codes
+        Component component = MiniMessage.miniMessage().deserialize(msg);
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(component);
     }
 }
