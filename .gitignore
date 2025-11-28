@@ -35,9 +35,5 @@ Thumbs.db
 *.swo
 node_modules/
 
-SPIGOT_CHECKLIST.md
-SPIGOT_DESCRIPTION.txt
-changelog.md
-release.ps1
 dependency-reduced-pom.xml
 pom.xml
