@@ -1,9 +1,5 @@
 package com.joshlucem.airwavechat.commands;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,50 +9,59 @@ import com.joshlucem.airwavechat.AirwaveChat;
 import com.joshlucem.airwavechat.util.MessageUtil;
 
 public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
+    private final AirwaveChat plugin;
+    public AirwaveChatCommand(AirwaveChat plugin) {
+        this.plugin = plugin;
+    }
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
+        if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
+            sender.sendMessage(MessageUtil.color(plugin.getMessage("help.header")));
             if (sender.hasPermission("airwavechat.admin")) {
-                for (String line : MessageUtil.getList("airwavechat_help_admin")) {
-                    sender.sendMessage(MessageUtil.color(line));
-                }
-            } else {
-                for (String line : MessageUtil.getList("airwavechat_help_user")) {
+                sender.sendMessage(MessageUtil.color(plugin.getMessage("help.admin_header")));
+                for (String line : plugin.getMessageList("help.menu_admin")) {
                     sender.sendMessage(MessageUtil.color(line));
                 }
             }
+            sender.sendMessage(MessageUtil.color(plugin.getMessage("help.user_header")));
+            for (String line : plugin.getMessageList("help.menu_user")) {
+                sender.sendMessage(MessageUtil.color(line));
+            }
             return true;
         }
-        if (args.length == 1 && args[0].equalsIgnoreCase("about")) {
-            sender.sendMessage("§3§m--------------------------------------");
-            sender.sendMessage("§b§lAirwaveChat §7| §eRadio Chat Plugin");
-            sender.sendMessage("§7Developed by §a@joshlucem");
-            sender.sendMessage("§7Version: §b1.0.0");
-            sender.sendMessage("§3§m--------------------------------------");
-            return true;
-        }
-        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+        if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("airwavechat.admin")) {
-                sender.sendMessage(MessageUtil.color(MessageUtil.get("no_permission")));
+                sender.sendMessage(MessageUtil.color(plugin.getMessage("permission.no_permission")));
                 return true;
             }
-            AirwaveChat plugin = AirwaveChat.getInstance();
-            plugin.reloadConfig();
-            MessageUtil.reload(plugin);
-            plugin.getFrequencyManager().reloadFrequenciesFromConfig();
-            plugin.getFrequencyManager().loadFrequencies();
-            sender.sendMessage(MessageUtil.color(MessageUtil.get("reload_success")));
+            try {
+                plugin.reloadConfigFiles();
+                sender.sendMessage(MessageUtil.color(plugin.getMessage("reload.success")));
+            } catch (Exception e) {
+                sender.sendMessage(MessageUtil.color(plugin.getMessage("reload.fail")));
+            }
             return true;
         }
-        sender.sendMessage(MessageUtil.color(MessageUtil.get("usage_airwavechat")));
+        if (args[0].equalsIgnoreCase("about")) {
+            sender.sendMessage(MessageUtil.color(
+                "<aqua>AirwaveChat by @joshlucem. Version: " + 
+                plugin.getPluginMeta().getVersion() + 
+                "</aqua>"));           
+                 return true;
+        }
+        sender.sendMessage(MessageUtil.color(plugin.getMessage("error.unknown_command")));
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+    public java.util.List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("reload", "about", "help");
+            java.util.List<String> subs = new java.util.ArrayList<>();
+            subs.add("help");
+            if (sender.hasPermission("airwavechat.admin")) subs.add("reload");
+            subs.add("about");
+            return subs;
         }
-        return Collections.emptyList();
+        return java.util.Collections.emptyList();
     }
 }

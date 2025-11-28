@@ -1,119 +1,113 @@
 package com.joshlucem.airwavechat.manager;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 public class FrequencyManager {
-    private List<Double> validFrequencies;
-    private final Map<UUID, Double> playerFrequencies = new ConcurrentHashMap<>();
-    private double min;
-    private double max;
-    private double step;
-    private final JavaPlugin plugin;
+    private final com.joshlucem.airwavechat.AirwaveChat plugin;
+    public static class Frequency {
+        public final String name;
+        public final String type; // AM or FM
+        public final double chatDistance;
+        public final Set<UUID> listeners = ConcurrentHashMap.newKeySet();
+        public Frequency(String name, String type, double chatDistance) {
+            this.name = name;
+            this.type = type;
+            this.chatDistance = chatDistance;
+        }
+    }
+    private final Map<String, Frequency> frequencies = new ConcurrentHashMap<>();
+    private final Map<UUID, String> playerFrequency = new ConcurrentHashMap<>();
 
-    private static final int MAX_FREQUENCIES = 100000;
-
-    public FrequencyManager(JavaPlugin plugin) {
+    public FrequencyManager(FileConfiguration config, com.joshlucem.airwavechat.AirwaveChat plugin) {
+        if (plugin == null) throw new IllegalArgumentException("Plugin cannot be null");
         this.plugin = plugin;
-        min = plugin.getConfig().getDouble("frequency.min");
-        max = plugin.getConfig().getDouble("frequency.max");
-        step = plugin.getConfig().getDouble("frequency.step");
-        validFrequencies = generateFrequencies(min, max, step);
-    }
-
-    public void reloadFrequenciesFromConfig() {
-        min = plugin.getConfig().getDouble("frequency.min");
-        max = plugin.getConfig().getDouble("frequency.max");
-        step = plugin.getConfig().getDouble("frequency.step");
-        validFrequencies = generateFrequencies(min, max, step);
-    }
-
-    public void saveFrequencies() {
-        org.bukkit.configuration.file.YamlConfiguration yaml = new org.bukkit.configuration.file.YamlConfiguration();
-        for (Map.Entry<UUID, Double> entry : playerFrequencies.entrySet()) {
-            yaml.set(entry.getKey().toString(), entry.getValue());
+        if (config == null) throw new IllegalArgumentException("Config cannot be null");
+        // General config options
+        boolean allowCustom = config.getBoolean("frequencies.allow_custom", true);
+        double fmMin = config.getDouble("frequencies.fm.min", 100.0);
+        double fmMax = config.getDouble("frequencies.fm.max", 199.9);
+        double fmStep = config.getDouble("frequencies.fm.step", 0.1);
+        double fmDistance = config.getDouble("frequencies.fm.chat_distance", 40.0);
+        int fmMaxCount = config.getInt("frequencies.fm.max_count", 1000);
+        double fmDefault = config.getDouble("frequencies.fm.default", 101.1);
+        int fmGenerated = 0;
+        for (double f = fmMin; f <= fmMax && fmGenerated < fmMaxCount; f += fmStep, fmGenerated++) {
+            String freq = String.format("%.1f", f);
+            frequencies.put(freq, new Frequency(freq, "FM", fmDistance));
         }
-        try {
-            yaml.save(new java.io.File(plugin.getDataFolder(), "frequencies.yml"));
-        } catch (java.io.IOException e) {
-            plugin.getLogger().log(java.util.logging.Level.WARNING, "Could not save frequencies.yml: {0}", e.getMessage());
+        int amMin = config.getInt("frequencies.am.min", 1000);
+        int amMax = config.getInt("frequencies.am.max", 1999);
+        int amStep = config.getInt("frequencies.am.step", 1);
+        double amDistance = config.getDouble("frequencies.am.chat_distance", 100.0);
+        int amMaxCount = config.getInt("frequencies.am.max_count", 1000);
+        int amDefault = config.getInt("frequencies.am.default", 1000);
+        int amGenerated = 0;
+        for (int a = amMin; a <= amMax && amGenerated < amMaxCount; a += amStep, amGenerated++) {
+            String freq = Integer.toString(a);
+            frequencies.put(freq, new Frequency(freq, "AM", amDistance));
         }
-    }
-
-    public void loadFrequencies() {
-        playerFrequencies.clear();
-        java.io.File file = new java.io.File(plugin.getDataFolder(), "frequencies.yml");
-        if (!file.exists()) return;
-        org.bukkit.configuration.file.YamlConfiguration yaml = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);
-        for (String key : yaml.getKeys(false)) {
-            try {
-                UUID uuid = java.util.UUID.fromString(key);
-                Double freq = yaml.getDouble(key);
-                if (isValidFrequency(freq)) {
-                    playerFrequencies.put(uuid, freq);
+        // Custom frequencies
+        if (allowCustom && config.isConfigurationSection("frequencies.custom")) {
+            var customSection = config.getConfigurationSection("frequencies.custom");
+            if (customSection != null) {
+                for (String key : customSection.getKeys(false)) {
+                    String type = customSection.getString(key + ".type", "FM");
+                    double value = (customSection.contains(key + ".frequency") && customSection.get(key + ".frequency") instanceof Number)
+                        ? customSection.getDouble(key + ".frequency")
+                        : (type.equalsIgnoreCase("AM") ? amDefault : fmDefault);
+                    double distance = (customSection.contains(key + ".chat_distance") && customSection.get(key + ".chat_distance") instanceof Number)
+                        ? customSection.getDouble(key + ".chat_distance")
+                        : (type.equalsIgnoreCase("AM") ? amDistance : fmDistance);
+                    frequencies.put(key, new Frequency(String.valueOf(value), type, distance));
                 }
-            } catch (IllegalArgumentException | NullPointerException ignored) {}
+            }
         }
+
     }
 
-    private List<Double> generateFrequencies(double min, double max, double step) {
-        List<Double> list = new ArrayList<>();
-        int count = 0;
-        for (double f = min; f <= max + 1e-9; f += step) {
-            list.add(Math.round(f * 10.0) / 10.0);
-            count++;
-            if (count >= MAX_FREQUENCIES) break;
+    public Collection<Frequency> getFrequencies() {
+        return frequencies.values();
+    }
+    public Frequency getFrequency(String name) {
+        return frequencies.get(name);
+    }
+    public boolean connect(Player player, String name, String type) {
+        if (player == null || name == null || type == null) return false;
+        Frequency freq = frequencies.get(name);
+        if (freq == null || !freq.type.equalsIgnoreCase(type)) return false;
+        // Current design supports one active frequency per player.
+        // If multiple are needed, refactor playerFrequency to Map<UUID, Set<String>>.
+        disconnect(player);
+        freq.listeners.add(player.getUniqueId());
+        playerFrequency.put(player.getUniqueId(), name);
+        // Save to persistent storage
+        if (plugin.getDataManager() != null) {
+            plugin.getDataManager().savePlayerFrequency(player.getUniqueId(), name);
         }
-        return list;
-    }
-
-    public boolean isValidFrequency(double freq) {
-        return validFrequencies.contains(Math.round(freq * 10.0) / 10.0);
-    }
-
-    public List<Double> getValidFrequencies() {
-        return validFrequencies;
-    }
-
-    public boolean connectPlayer(UUID uuid, double freq) {
-        if (!isValidFrequency(freq)) return false;
-        Double current = playerFrequencies.get(uuid);
-        if (current != null && current.equals(freq)) return false;
-        playerFrequencies.put(uuid, freq);
-        saveFrequencies();
         return true;
     }
-
-    public boolean disconnectPlayer(UUID uuid) {
-        boolean removed = playerFrequencies.remove(uuid) != null;
-        if (removed) saveFrequencies();
-        return removed;
-    }
-
-    public Double getPlayerFrequency(UUID uuid) {
-        return playerFrequencies.get(uuid);
-    }
-
-    public int getFrequencyCount(double freq) {
-        int count = 0;
-        for (Double f : playerFrequencies.values()) {
-            if (f.equals(freq)) count++;
+    public void disconnect(Player player) {
+        if (player == null) return;
+        String freqName = playerFrequency.remove(player.getUniqueId());
+        if (freqName != null) {
+            Frequency freq = frequencies.get(freqName);
+            if (freq != null) freq.listeners.remove(player.getUniqueId());
+            // Remove from persistent storage
+            if (plugin.getDataManager() != null) {
+                plugin.getDataManager().removePlayerFrequency(player.getUniqueId());
+            }
         }
-        return count;
     }
-
-    public Set<UUID> getPlayersOnFrequency(double freq) {
-        Set<UUID> set = new HashSet<>();
-        for (Map.Entry<UUID, Double> e : playerFrequencies.entrySet()) {
-            if (e.getValue().equals(freq)) set.add(e.getKey());
-        }
-        return set;
+    public Frequency getPlayerFrequency(Player player) {
+        if (player == null) return null;
+        String freqName = playerFrequency.get(player.getUniqueId());
+        return freqName != null ? frequencies.get(freqName) : null;
     }
 }

@@ -1,21 +1,56 @@
-# AirwaveChat - Main configuration file
-#
-# Frequency limits:
-# The number of available frequencies is calculated as:
-#   (max - min) / step + 1
-# The maximum allowed is 100,000 frequencies. If you exceed this, only the first 100,000 will be used.
-#
-# Examples:
-#   min: 0.1, max: 10.0, step: 0.1   -> 100 frequencies
-#   min: 0.1, max: 100.0, step: 0.1   -> 1,000 frequencies
-#   min: 0.1, max: 10,000.0, step: 0.1 -> 100,000 frequencies (limit)
-#
-# Adjust these values to set the allowed frequency range and step for radio chat.
+# AirwaveChat configuration
 
-frequency:
-  # Minimum allowed frequency (inclusive)
-  min: 0.1
-  # Maximum allowed frequency (inclusive)
-  max: 10.0
-  # Step size for frequency selection (e.g., 0.1 means 0.1, 0.2, 0.3, ...)
-  step: 0.1
+# Frequency settings
+frequencies:
+  allow_custom: true                  # Allow custom frequencies
+  fm:
+    min: 100.0                        # FM minimum frequency
+    max: 199.9                        # FM maximum frequency
+    step: 0.1                         # FM frequency increment
+    default: 101.1                    # Default FM frequency
+    chat_distance: 40.0               # FM chat distance (blocks)
+    max_count: 1000                   # Max FM frequencies generated
+  am:
+    min: 1000                         # AM minimum frequency
+    max: 1999                         # AM maximum frequency
+    step: 1                           # AM frequency increment
+    default: 1000                     # Default AM frequency
+    chat_distance: 100.0              # AM chat distance (blocks)
+    max_count: 1000                   # Max AM frequencies generated
+  custom:
+    Police:
+      type: "FM"                      # Custom frequency type
+      frequency: 123                 # Custom frequency value
+      chat_distance: 60.0             # Custom chat distance
+    Emergency:
+      type: "AM"
+      frequency: 456                  # Custom frequency value
+      chat_distance: 120.0             # Custom chat distance
+    # Example: add more custom channels below
+    # Taxi:
+    #   type: "FM"
+    #   chat_distance: 50.0
+
+# General options
+options:
+  show_join_message: true             # Show message when connecting
+  show_disconnect_message: true       # Show message when disconnecting
+  enable_proximity: true              # Enable proximity chat
+  max_message_length: 256             # Maximum chat message length
+  cooldown_connect: 2                 # Seconds cooldown between connects
+  cooldown_disconnect: 2              # Seconds cooldown between disconnects
+  enable_static: true                 # Enable static/distortion effect with distance
+  static_threshold: 0.75              # Distance % where static starts (0.0-1.0)
+  static_intensity: 0.5               # Static intensity multiplier (0.0-1.0)
+  enable_signal_bar: true             # Show signal strength in action bar
+  signal_update_interval: 20          # Ticks between signal updates (20 = 1 second)
+  enable_sounds: true                 # Enable radio sound effects
+  sound_connect: "block.note_block.pling"  # Sound on connect
+  sound_disconnect: "block.note_block.bass" # Sound on disconnect
+  sound_static: "entity.experience_orb.pickup" # Sound with static messages
+
+# Advanced settings
+advanced:
+  debug_mode: false                   # Enable debug mode
+
+# End of configuration file

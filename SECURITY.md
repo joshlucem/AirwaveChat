@@ -11,9 +11,13 @@ If you discover a security vulnerability in AirwaveChat, please report it privat
 Only the latest release is actively maintained and receives security updates.
 
 | Version   | Supported          |
-|-----------|--------------------|
-| 1.21.x     | ✅                 |
-| < 1.20.5     | ❌                 |
+|-----------|--------------------|  
+| 1.0.x     | ✅                 |
+| < 1.0.0   | ❌                 |
+
+**Server Compatibility:**
+- Paper/Spigot/Folia 1.20.4+ ✅
+- Java 21+ ✅
 
 ## Security Best Practices
 - Do not share your server configuration or sensitive data publicly.
