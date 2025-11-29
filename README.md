@@ -12,12 +12,12 @@
 
 ---
 
-**AirwaveChat** is a radio chat plugin for Paper/Spigot/Folia 1.20.4+ servers, developed by **@joshlucem**. It allows players to communicate on private frequencies with realistic features like proximity chat, signal degradation, and radio static effects.
+**AirwaveChat** is a radio chat plugin for Paper/Spigot/Folia 1.20.4+ servers, developed by **@joshlucem**. It lets players communicate over private frequencies with realistic radio behavior: proximity chat, signal degradation, and convincing static.
 
 ---
 
 ## Download
-You can always download the latest version of AirwaveChat from the [Releases page](https://github.com/joshlucem/AirwaveChat/releases).
+Get the latest build from the [Releases page](https://github.com/joshlucem/AirwaveChat/releases).
 
 ## Features
 - 🔊 **Proximity-based chat** with configurable distance limits
@@ -74,8 +74,35 @@ The plugin offers extensive configuration options:
 - Java 21+
 
 ## Installation
-1. Download the latest `.jar` from [Releases](https://github.com/joshlucem/AirwaveChat/releases)
-2. Place in your server's `plugins/` folder
-3. Restart your server
-4. Configure `config.yml` and `messages.yml` as needed
-5. Reload with `/awc reload`
+1. Download the latest `.jar` from [Releases](https://github.com/joshlucem/AirwaveChat/releases).
+2. Place it in your server's `plugins/` folder.
+3. Restart your server.
+4. Configure `config.yml` and `messages.yml` as needed.
+5. Run `/awc reload` to apply changes.
+
+## Quick Start
+- Tune to a frequency: `/connect FM 101.1` or `/connect AM 1025`.
+- Talk on the tuned channel by chatting normally.
+- Check signal and distance in the action bar.
+- Search for channels: `/frequencies search alpha`.
+- Disconnect when done: `/disconnect`.
+
+## Static Mechanic
+
+AirwaveChat simulates radio interference as the signal weakens. Messages progressively degrade—characters drop out or become garbled—making long‑range communication harder and more authentic. The action bar also reflects your current band/frequency and signal strength.
+
+Below are visual examples of how the static mechanic appears in‑game:
+
+![Static Example 1](img/static_example_1.png)
+![Static Example 2](img/static_example_2.png)
+
+In these screenshots, missing and distorted characters indicate poor signal quality, encouraging players to move closer, switch bands, or change frequencies for clearer comms.
+
+---
+
+## Support & Feedback
+- Join the community on Discord: https://discord.gg/UzXWvshGfh
+- Report issues or request features on the [Issues](https://github.com/joshlucem/AirwaveChat/issues) page.
+
+## License
+This project is licensed under the terms described in `LICENSE`.
