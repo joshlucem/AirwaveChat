@@ -5,6 +5,26 @@ All notable changes to AirwaveChat will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-12-06
+
+### Added
+- **Multi-language Message Files**: Spanish (`messages_es.yml`), Portuguese (`messages_pt.yml`), and English (`messages_en.yml`) translations for all messages
+- **Dynamic Language Switching**: Change server language by modifying `config.yml` and executing `/airwavechat reload`
+- **Automatic Message Import System**: Language files are automatically imported into `messages.yml` on reload
+- **Language Configuration Option**: New `options.language` setting in `config.yml` (en, es, pt)
+- **Language Setup Guide**: New `LANGUAGE_SETUP.md` documentation for language configuration
+
+### Changed
+- **Code Optimization**: Improved caching and message handling efficiency
+- **FrequencyManager**: Optimized frequency initialization with better memory management
+- **AirwaveChat.java**: Added language loading system with `loadLanguageMessages()` and `copyConfigurationSection()` methods
+- **config.yml**: Added language option to options section
+
+### Performance
+- Reduced memory footprint by using static message deserializer
+- Improved frequency lookup performance with concurrent collections
+- Optimized configuration file reading
+
 ## [1.0.1] - 2025-11-28
 
 ### Added

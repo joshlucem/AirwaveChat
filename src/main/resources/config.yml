@@ -33,6 +33,7 @@ frequencies:
 
 # General options
 options:
+  language: "en"                      # Language: en, es, pt
   show_join_message: true             # Show message when connecting
   show_disconnect_message: true       # Show message when disconnecting
   enable_proximity: true              # Enable proximity chat
