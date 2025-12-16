@@ -49,9 +49,19 @@ options:
   sound_connect: "block.note_block.pling"  # Sound on connect
   sound_disconnect: "block.note_block.bass" # Sound on disconnect
   sound_static: "entity.experience_orb.pickup" # Sound with static messages
+  connect_cooldown_seconds: 5         # Cooldown between frequency switches (0 = disabled)
+  passcode_max_attempts: 3            # Max passcode attempts before lockout
+  passcode_lockout_seconds: 30        # Lockout duration after max attempts
 
 # Advanced settings
 advanced:
   debug_mode: false                   # Enable debug mode
+  persist_custom_frequencies: true    # Save/restore custom frequencies across restarts
+  custom_frequency_cost:              # Resource cost to create custom frequency
+    redstone_blocks: 32               # Redstone blocks required
+    netherite_ingots: 8               # Netherite ingots required
+  frequency_auto_cleanup:
+    enabled: false                    # Auto-remove inactive custom frequencies
+    inactivity_days: 7                # Days before removal
 
 # End of configuration file
