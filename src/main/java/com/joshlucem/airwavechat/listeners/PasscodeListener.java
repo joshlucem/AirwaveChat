@@ -1,15 +1,17 @@
 package com.joshlucem.airwavechat.listeners;
 
-import com.joshlucem.airwavechat.AirwaveChat;
-import com.joshlucem.airwavechat.gui.GUIManager;
-import com.joshlucem.airwavechat.manager.FrequencyManager;
-import com.joshlucem.airwavechat.util.MessageUtil;
-import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+
+import com.joshlucem.airwavechat.AirwaveChat;
+import com.joshlucem.airwavechat.gui.GUIManager;
+import com.joshlucem.airwavechat.manager.FrequencyManager;
+import com.joshlucem.airwavechat.util.MessageUtil;
+
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class PasscodeListener implements Listener {
     private final GUIManager guiManager;
