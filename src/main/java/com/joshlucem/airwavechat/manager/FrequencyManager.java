@@ -26,17 +26,41 @@ public class FrequencyManager {
         public final String type; // AM or FM
         public final double chatDistance;
         public final Set<UUID> listeners;
+        private boolean encrypted;
+        private String passcode;
+        private UUID owner;
 
         public Frequency(String name, String type, double chatDistance) {
             this.name = name;
             this.type = type;
             this.chatDistance = chatDistance;
             this.listeners = ConcurrentHashMap.newKeySet();
+            this.encrypted = false;
+        }
+
+        public boolean isEncrypted() {
+            return encrypted && passcode != null && !passcode.isEmpty();
+        }
+
+        public void setEncryption(UUID owner, String passcode) {
+            this.owner = owner;
+            this.passcode = passcode;
+            this.encrypted = passcode != null && !passcode.isEmpty();
+        }
+
+        public boolean checkPasscode(String candidate) {
+            if (!isEncrypted()) return true;
+            return passcode != null && passcode.equals(candidate);
+        }
+
+        public UUID getOwner() {
+            return owner;
         }
     }
 
     private final Map<String, Frequency> frequencies;
     private final Map<UUID, String> playerFrequency;
+    private final Map<UUID, String> authorizedEncryptedAccess;
 
     public FrequencyManager(FileConfiguration config, AirwaveChat plugin) {
         if (plugin == null) throw new IllegalArgumentException("Plugin cannot be null");
@@ -45,6 +69,7 @@ public class FrequencyManager {
         this.plugin = plugin;
         this.frequencies = new ConcurrentHashMap<>();
         this.playerFrequency = new ConcurrentHashMap<>();
+        this.authorizedEncryptedAccess = new ConcurrentHashMap<>();
         
         // Load frequencies from configuration
         loadFrequencies(config);
@@ -160,6 +185,14 @@ public class FrequencyManager {
         
         Frequency freq = frequencies.get(name);
         if (freq == null || !freq.type.equalsIgnoreCase(type)) return false;
+
+        // Encrypted check
+        if (freq.isEncrypted()) {
+            String auth = authorizedEncryptedAccess.get(player.getUniqueId());
+            if (auth == null || !auth.equals(name)) {
+                return false;
+            }
+        }
         
         // Disconnect from current frequency first
         disconnect(player);
@@ -173,6 +206,9 @@ public class FrequencyManager {
         if (dataManager != null) {
             dataManager.savePlayerFrequency(player.getUniqueId(), name);
         }
+
+        // consume one-time authorization
+        authorizedEncryptedAccess.remove(player.getUniqueId());
         
         return true;
     }
@@ -209,5 +245,22 @@ public class FrequencyManager {
         
         String freqName = playerFrequency.get(player.getUniqueId());
         return freqName != null ? frequencies.get(freqName) : null;
+    }
+
+    /**
+     * Authorize a player for a single encrypted connection attempt.
+     */
+    public void authorizeEncryptedAccess(UUID playerId, String frequencyName) {
+        authorizedEncryptedAccess.put(playerId, frequencyName);
+    }
+
+    /**
+     * Create a custom frequency dynamically (used for claimed nodes).
+     */
+    public Frequency createCustomFrequency(String name, String type, double distance, UUID owner, String passcode) {
+        Frequency f = new Frequency(name, type, distance);
+        f.setEncryption(owner, passcode);
+        frequencies.put(name, f);
+        return f;
     }
 }
