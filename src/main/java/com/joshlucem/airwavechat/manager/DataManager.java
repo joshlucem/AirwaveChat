@@ -80,7 +80,15 @@ public class DataManager {
      * Save data asynchronously to avoid blocking the main thread.
      */
     private void saveDataAsync() {
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, this::saveData);
+        // Check if running on Folia
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            // Folia - use async scheduler
+            org.bukkit.Bukkit.getAsyncScheduler().runNow(plugin, task -> saveData());
+        } catch (ClassNotFoundException e) {
+            // Not Folia - use traditional scheduler
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, this::saveData);
+        }
     }
 
     /**
