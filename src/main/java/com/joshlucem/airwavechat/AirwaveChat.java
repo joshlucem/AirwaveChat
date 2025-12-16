@@ -9,7 +9,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import com.joshlucem.airwavechat.commands.AirwaveChatCommand;
 import com.joshlucem.airwavechat.commands.ConnectCommand;
@@ -33,7 +32,7 @@ public class AirwaveChat extends JavaPlugin {
     private FileConfiguration guiConfig;
     private FileConfiguration messages;
     private Map<String, String> msg;
-    private BukkitTask signalTask;
+    private int signalTaskId = -1;
 
     /**
      * Get a single message string by key, e.g. "connect.success" or
@@ -80,10 +79,7 @@ public class AirwaveChat extends JavaPlugin {
     public void reloadPluginComponents() {
         reloadConfigFiles();
         HandlerList.unregisterAll(this);
-        if (signalTask != null) {
-            signalTask.cancel();
-            signalTask = null;
-        }
+        stopSignalTask();
         initializeComponents();
         startSignalTask();
     }
@@ -244,10 +240,7 @@ public class AirwaveChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (signalTask != null) {
-            signalTask.cancel();
-            signalTask = null;
-        }
+        stopSignalTask();
         getLogger().info("AirwaveChat v1.0.3 disabled. See you next time!");
     }
 
@@ -266,6 +259,14 @@ public class AirwaveChat extends JavaPlugin {
             return;
         }
         int signalInterval = config.getInt("options.signal_update_interval", 20);
-        signalTask = new SignalBarTask(this, frequencyManager).runTaskTimer(this, 20L, signalInterval);
+        signalTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, 
+            new SignalBarTask(this, frequencyManager), 20L, signalInterval);
+    }
+
+    private void stopSignalTask() {
+        if (signalTaskId != -1) {
+            getServer().getScheduler().cancelTask(signalTaskId);
+            signalTaskId = -1;
+        }
     }
 }
