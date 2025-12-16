@@ -17,8 +17,10 @@ import com.joshlucem.airwavechat.commands.FrequenciesCommand;
 import com.joshlucem.airwavechat.gui.GUIClickListener;
 import com.joshlucem.airwavechat.gui.GUIManager;
 import com.joshlucem.airwavechat.listeners.FrequencyChatListener;
+import com.joshlucem.airwavechat.listeners.PasscodeListener;
 import com.joshlucem.airwavechat.listeners.PlayerJoinListener;
 import com.joshlucem.airwavechat.listeners.PlayerQuitListener;
+import com.joshlucem.airwavechat.listeners.StructureInteractListener;
 import com.joshlucem.airwavechat.manager.DataManager;
 import com.joshlucem.airwavechat.manager.FrequencyManager;
 import com.joshlucem.airwavechat.tasks.SignalBarTask;
@@ -120,6 +122,8 @@ public class AirwaveChat extends JavaPlugin {
         pluginManager.registerEvents(new PlayerQuitListener(frequencyManager), this);
         pluginManager.registerEvents(new PlayerJoinListener(frequencyManager, dataManager), this);
         pluginManager.registerEvents(new GUIClickListener(this, guiManager, frequencyManager), this);
+        pluginManager.registerEvents(new PasscodeListener(guiManager, frequencyManager, this), this);
+        pluginManager.registerEvents(new StructureInteractListener(guiManager), this);
     }
 
     public void reloadConfigFiles() {
