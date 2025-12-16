@@ -14,8 +14,8 @@ import com.joshlucem.airwavechat.commands.AirwaveChatCommand;
 import com.joshlucem.airwavechat.commands.ConnectCommand;
 import com.joshlucem.airwavechat.commands.DisconnectCommand;
 import com.joshlucem.airwavechat.commands.FrequenciesCommand;
-import com.joshlucem.airwavechat.gui.GUIManager;
 import com.joshlucem.airwavechat.gui.GUIClickListener;
+import com.joshlucem.airwavechat.gui.GUIManager;
 import com.joshlucem.airwavechat.listeners.FrequencyChatListener;
 import com.joshlucem.airwavechat.listeners.PlayerJoinListener;
 import com.joshlucem.airwavechat.listeners.PlayerQuitListener;
@@ -258,15 +258,38 @@ public class AirwaveChat extends JavaPlugin {
         if (!config.getBoolean("options.enable_signal_bar", true)) {
             return;
         }
-        int signalInterval = config.getInt("options.signal_update_interval", 20);
-        signalTaskId = getServer().getScheduler().scheduleSyncRepeatingTask(this, 
-            new SignalBarTask(this, frequencyManager), 20L, signalInterval);
+        
+        // Check if running on Folia (which uses a different scheduler API)
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            // Running on Folia - use async scheduler with TimeUnit
+            int signalInterval = config.getInt("options.signal_update_interval", 20);
+            long intervalMillis = signalInterval * 50L; // Convert ticks to milliseconds
+            
+            org.bukkit.Bukkit.getAsyncScheduler().runAtFixedRate(this, 
+                task -> new SignalBarTask(this, frequencyManager).run(), 
+                1000L, intervalMillis, java.util.concurrent.TimeUnit.MILLISECONDS);
+            getLogger().info("Signal bar task started using Folia async scheduler");
+        } catch (ClassNotFoundException e) {
+            // Not Folia - use traditional scheduler (Paper/Spigot)
+            int signalInterval = config.getInt("options.signal_update_interval", 20);
+            signalTaskId = getServer().getScheduler().scheduleAsyncRepeatingTask(this, 
+                new SignalBarTask(this, frequencyManager), 20L, signalInterval);
+        }
     }
 
     private void stopSignalTask() {
-        if (signalTaskId != -1) {
-            getServer().getScheduler().cancelTask(signalTaskId);
-            signalTaskId = -1;
+        // Check if Folia
+        try {
+            Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+            // Folia - tasks are cancelled automatically on plugin disable
+            // Individual task cancellation not needed with async scheduler
+        } catch (ClassNotFoundException e) {
+            // Not Folia - use traditional cancellation
+            if (signalTaskId != -1) {
+                getServer().getScheduler().cancelTask(signalTaskId);
+                signalTaskId = -1;
+            }
         }
     }
 }
