@@ -6,8 +6,20 @@ messages:
     success: "<green>Connected to <#00FFAA>{type}</#00FFAA> frequency <yellow>{frequency}</yellow>."
     not_found: "<red>Frequency {frequency} does not exist for type {type}."
     invalid_type: "<red>Type must be FM or AM. Example: /connect FM 101.1"
-    cooldown_active: "<red>Wait before connecting again."
+    cooldown_active: "<yellow>Wait {seconds}s before switching frequencies."
     usage: "<yellow>Usage: /connect FM/AM [frequency]"
+    encrypted: "<red>Frequency is encrypted. Enter passcode in chat."
+  passcode:
+    request: "<yellow>Frequency is encrypted. Enter passcode in chat (or leave empty)."
+    success: "<green>Correct passcode! Connected."
+    incorrect: "<red>Incorrect passcode."
+    max_attempts: "<red>Too many incorrect attempts. Locked out for {seconds}s."
+    set: "<green>Passcode set. Frequency is now encrypted."
+    open: "<yellow>Frequency created without passcode (open access)."
+  structure:
+    detected: "<gold>Core detected! Right-click to claim a frequency."
+    invalid_cost: "<red>You need 32 redstone blocks and 8 netherite ingots to claim."
+    created: "<green>Frequency {frequency} created! Enter passcode in chat or leave empty."
   disconnect:
     success: "<gray>Disconnected from the current frequency."
     not_connected: "<red>You are not connected to any frequency."
