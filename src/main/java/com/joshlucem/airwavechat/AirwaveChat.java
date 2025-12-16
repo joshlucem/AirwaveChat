@@ -7,12 +7,16 @@ import java.util.Map;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.joshlucem.airwavechat.commands.AirwaveChatCommand;
 import com.joshlucem.airwavechat.commands.ConnectCommand;
 import com.joshlucem.airwavechat.commands.DisconnectCommand;
 import com.joshlucem.airwavechat.commands.FrequenciesCommand;
+import com.joshlucem.airwavechat.gui.GUIManager;
+import com.joshlucem.airwavechat.gui.GUIClickListener;
 import com.joshlucem.airwavechat.listeners.FrequencyChatListener;
 import com.joshlucem.airwavechat.listeners.PlayerJoinListener;
 import com.joshlucem.airwavechat.listeners.PlayerQuitListener;
@@ -24,9 +28,12 @@ public class AirwaveChat extends JavaPlugin {
 
     private FrequencyManager frequencyManager;
     private DataManager dataManager;
+    private GUIManager guiManager;
     private FileConfiguration config;
+    private FileConfiguration guiConfig;
     private FileConfiguration messages;
     private Map<String, String> msg;
+    private BukkitTask signalTask;
 
     /**
      * Get a single message string by key, e.g. "connect.success" or
@@ -51,26 +58,34 @@ public class AirwaveChat extends JavaPlugin {
         return dataManager;
     }
 
+    public GUIManager getGUIManager() {
+        return guiManager;
+    }
+
+    public FileConfiguration getGuiConfig() {
+        return guiConfig;
+    }
+
     @Override
     public void onEnable() {
-        getLogger().info("AirwaveChat v1.0.2 enabled. Developed by joshlucem.");
+        getLogger().info("AirwaveChat v1.0.3 enabled. Developed by joshlucem.");
         reloadConfigFiles();
+        initializeComponents();
+        startSignalTask();
+    }
 
-        // Initialize managers
-        frequencyManager = new FrequencyManager(config, this);
-        dataManager = new DataManager(this);
-
-        // Register commands efficiently
-        registerCommands();
-
-        // Register listeners
-        registerListeners();
-
-        // Start signal bar task with configured interval
-        if (config.getBoolean("options.enable_signal_bar", true)) {
-            int signalInterval = config.getInt("options.signal_update_interval", 20);
-            new SignalBarTask(this, frequencyManager).runTaskTimer(this, 20L, signalInterval);
+    /**
+     * Reload configuration and rebuild managers, listeners, commands and tasks safely.
+     */
+    public void reloadPluginComponents() {
+        reloadConfigFiles();
+        HandlerList.unregisterAll(this);
+        if (signalTask != null) {
+            signalTask.cancel();
+            signalTask = null;
         }
+        initializeComponents();
+        startSignalTask();
     }
 
     /**
@@ -108,6 +123,7 @@ public class AirwaveChat extends JavaPlugin {
         pluginManager.registerEvents(new FrequencyChatListener(frequencyManager, this), this);
         pluginManager.registerEvents(new PlayerQuitListener(frequencyManager), this);
         pluginManager.registerEvents(new PlayerJoinListener(frequencyManager, dataManager), this);
+        pluginManager.registerEvents(new GUIClickListener(this, guiManager, frequencyManager), this);
     }
 
     public void reloadConfigFiles() {
@@ -117,14 +133,17 @@ public class AirwaveChat extends JavaPlugin {
         File configFile = new File(getDataFolder(), "config.yml");
         config = YamlConfiguration.loadConfiguration(configFile);
 
+        // Load GUI config
+        File guiFile = new File(getDataFolder(), "gui.yml");
+        if (!guiFile.exists()) {
+            saveResource("gui.yml", false);
+        }
+        guiConfig = YamlConfiguration.loadConfiguration(guiFile);
+
         // Load messages from appropriate language file
         String language = config.getString("options.language", "en").toLowerCase();
         loadLanguageMessages(language);
 
-        // Reload FrequencyManager if already initialized
-        if (frequencyManager != null) {
-            frequencyManager = new FrequencyManager(config, this);
-        }
     }
 
     /**
@@ -225,6 +244,28 @@ public class AirwaveChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getLogger().info("AirwaveChat v1.0.2 disabled. See you next time!");
+        if (signalTask != null) {
+            signalTask.cancel();
+            signalTask = null;
+        }
+        getLogger().info("AirwaveChat v1.0.3 disabled. See you next time!");
+    }
+
+    private void initializeComponents() {
+        frequencyManager = new FrequencyManager(config, this);
+        dataManager = new DataManager(this);
+        guiManager = new GUIManager(this, frequencyManager);
+
+        // Register commands and listeners again to point to the new managers
+        registerCommands();
+        registerListeners();
+    }
+
+    private void startSignalTask() {
+        if (!config.getBoolean("options.enable_signal_bar", true)) {
+            return;
+        }
+        int signalInterval = config.getInt("options.signal_update_interval", 20);
+        signalTask = new SignalBarTask(this, frequencyManager).runTaskTimer(this, 20L, signalInterval);
     }
 }
