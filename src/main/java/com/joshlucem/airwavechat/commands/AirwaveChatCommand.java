@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 import com.joshlucem.airwavechat.AirwaveChat;
 import com.joshlucem.airwavechat.util.MessageUtil;
@@ -35,11 +36,20 @@ public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             try {
-                plugin.reloadConfigFiles();
+                plugin.reloadPluginComponents();
                 sender.sendMessage(MessageUtil.color(plugin.getMessage("reload.success")));
             } catch (Exception e) {
                 sender.sendMessage(MessageUtil.color(plugin.getMessage("reload.fail")));
             }
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("gui") || args[0].equalsIgnoreCase("menu")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(MessageUtil.color("<red>This command is only for players!</red>"));
+                return true;
+            }
+            Player player = (Player) sender;
+            plugin.getGUIManager().openMainMenu(player);
             return true;
         }
         if (args[0].equalsIgnoreCase("about")) {
@@ -58,6 +68,8 @@ public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             java.util.List<String> subs = new java.util.ArrayList<>();
             subs.add("help");
+            subs.add("gui");
+            subs.add("menu");
             if (sender.hasPermission("airwavechat.admin")) subs.add("reload");
             subs.add("about");
             return subs;
