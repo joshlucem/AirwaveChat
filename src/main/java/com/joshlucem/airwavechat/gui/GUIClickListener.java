@@ -1,13 +1,16 @@
 package com.joshlucem.airwavechat.gui;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
 
 import com.joshlucem.airwavechat.AirwaveChat;
 import com.joshlucem.airwavechat.manager.FrequencyManager;
+import com.joshlucem.airwavechat.util.MessageUtil;
 
 public class GUIClickListener implements Listener {
 
@@ -29,135 +32,82 @@ public class GUIClickListener implements Listener {
         InventoryView view = event.getView();
         String title = view.getTitle();
 
-        // Procesar clicks según el menú actual
-        if (title.contains("Main Menu")) {
+        if (title.contains("Airwave Connect")) {
             event.setCancelled(true);
-            handleMainMenuClick(event, player);
-        } else if (title.contains("Frequencies")) {
+            handleRoot(event, player);
+        } else if (title.contains("Canales")) {
             event.setCancelled(true);
-            handleFrequenciesMenuClick(event, player);
-        } else if (title.contains("Favorites")) {
+            handleChannelList(event, player);
+        } else if (title.contains("Reclamar Frecuencia")) {
             event.setCancelled(true);
-            handleFavoritesMenuClick(event, player);
-        } else if (title.contains("Statistics")) {
-            event.setCancelled(true);
-            handleStatsMenuClick(event, player);
-        } else if (title.contains("Information")) {
-            event.setCancelled(true);
-            handleInfoMenuClick(event, player);
+            handleClaimMenu(event, player);
         }
     }
 
-    private void handleMainMenuClick(InventoryClickEvent event, Player player) {
+    private void handleRoot(InventoryClickEvent event, Player player) {
         int slot = event.getSlot();
-        if (slot < 0) return;
-
-        var mainConfig = plugin.getGuiConfig().getConfigurationSection("main_menu");
-        if (mainConfig == null) return;
-
-        if (mainConfig.getInt("frequencies_button.slot", -1) == slot) {
-            guiManager.openFrequenciesMenu(player, 0);
-        } else if (mainConfig.getInt("favorites_button.slot", -1) == slot) {
-            guiManager.openFavoritesMenu(player);
-        } else if (mainConfig.getInt("stats_button.slot", -1) == slot) {
-            guiManager.openStatsMenu(player);
-        } else if (mainConfig.getInt("info_button.slot", -1) == slot) {
-            guiManager.openInfoMenu(player);
+        if (slot == 11) {
+            guiManager.openChannelList(player, "FM");
+        } else if (slot == 15) {
+            guiManager.openChannelList(player, "AM");
         }
     }
 
-    private void handleFrequenciesMenuClick(InventoryClickEvent event, Player player) {
+    private void handleChannelList(InventoryClickEvent event, Player player) {
+        ItemStack clicked = event.getCurrentItem();
+        if (clicked == null || !clicked.hasItemMeta()) return;
+        String name = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText()
+            .serialize(clicked.getItemMeta().displayName());
+        if (name == null || name.isEmpty()) return;
+
+        FrequencyManager.Frequency freq = frequencyManager.getFrequency(name);
+        if (freq == null) return;
+
+        if (freq.isEncrypted()) {
+            guiManager.requestPasscode(player, freq.name, false);
+            player.closeInventory();
+            player.sendMessage(MessageUtil.color("<red>Frecuencia cifrada. Ingresa la clave en el chat."));
+        } else {
+            frequencyManager.connect(player, freq.name, freq.type);
+            player.closeInventory();
+        }
+    }
+
+    private void handleClaimMenu(InventoryClickEvent event, Player player) {
         int slot = event.getSlot();
-        if (slot < 0) return;
-
-        var freqConfig = plugin.getGuiConfig().getConfigurationSection("frequencies_menu");
-        if (freqConfig == null) return;
-
-        // Botón Back
-        if (freqConfig.getInt("back_button.slot", -1) == slot) {
-            guiManager.openMainMenu(player);
+        if (slot != 11 && slot != 15) return;
+        String type = slot == 11 ? "FM" : "AM";
+        // Validar costo
+        if (!hasCost(player)) {
+            player.sendMessage(MessageUtil.color("<red>Necesitas 32 bloques de redstone y 8 lingotes de netherite."));
             return;
         }
-
-        // Click en frecuencia
-        String frequencyName = extractFrequencyName(event.getCurrentItem());
-        if (frequencyName != null && !frequencyName.isEmpty()) {
-            if (event.isShiftClick()) {
-                guiManager.addFavorite(player, frequencyName);
-            } else {
-                FrequencyManager.Frequency freq = frequencyManager.getFrequency(frequencyName);
-                if (freq != null) {
-                    frequencyManager.connect(player, frequencyName, freq.type);
-                    player.closeInventory();
-                }
-            }
-        }
+        takeCost(player);
+        // Crear frecuencia nueva
+        double distance = type.equals("FM") ? plugin.getConfig().getDouble("frequencies.fm.chat_distance", 40.0)
+            : plugin.getConfig().getDouble("frequencies.am.chat_distance", 100.0);
+        String freqName = generateName(type);
+        frequencyManager.createCustomFrequency(freqName, type, distance, player.getUniqueId(), "");
+        player.closeInventory();
+        player.sendMessage(MessageUtil.color("<green>Frecuencia " + freqName + " creada. Escribe clave en el chat (o deja vacío)."));
+        guiManager.requestPasscode(player, freqName, true);
     }
 
-    private void handleFavoritesMenuClick(InventoryClickEvent event, Player player) {
-        int slot = event.getSlot();
-        if (slot < 0) return;
-
-        var favConfig = plugin.getGuiConfig().getConfigurationSection("favorites_menu");
-        if (favConfig == null) return;
-
-        // Botón Back
-        if (favConfig.getInt("back_button.slot", -1) == slot) {
-            guiManager.openMainMenu(player);
-            return;
-        }
-
-        // Click en favorito
-        String frequencyName = extractFrequencyName(event.getCurrentItem());
-        if (frequencyName != null && !frequencyName.isEmpty()) {
-            if (event.isShiftClick()) {
-                guiManager.removeFavorite(player, frequencyName);
-                guiManager.openFavoritesMenu(player);
-            } else {
-                FrequencyManager.Frequency freq = frequencyManager.getFrequency(frequencyName);
-                if (freq != null) {
-                    frequencyManager.connect(player, frequencyName, freq.type);
-                    player.closeInventory();
-                }
-            }
-        }
+    private boolean hasCost(Player player) {
+        return player.getInventory().containsAtLeast(new ItemStack(Material.REDSTONE_BLOCK), 32)
+            && player.getInventory().containsAtLeast(new ItemStack(Material.NETHERITE_INGOT), 8);
     }
 
-    private void handleStatsMenuClick(InventoryClickEvent event, Player player) {
-        int slot = event.getSlot();
-        if (slot < 0) return;
-
-        var statsConfig = plugin.getGuiConfig().getConfigurationSection("stats_menu");
-        if (statsConfig == null) return;
-
-        if (statsConfig.getInt("back_button.slot", -1) == slot) {
-            guiManager.openMainMenu(player);
-        }
+    private void takeCost(Player player) {
+        player.getInventory().removeItem(new ItemStack(Material.REDSTONE_BLOCK, 32));
+        player.getInventory().removeItem(new ItemStack(Material.NETHERITE_INGOT, 8));
     }
 
-    private void handleInfoMenuClick(InventoryClickEvent event, Player player) {
-        int slot = event.getSlot();
-        if (slot < 0) return;
-
-        var infoConfig = plugin.getGuiConfig().getConfigurationSection("info_menu");
-        if (infoConfig == null) return;
-
-        if (infoConfig.getInt("back_button.slot", -1) == slot) {
-            guiManager.openMainMenu(player);
+    private String generateName(String type) {
+        String base = type + "-" + (int)(Math.random() * 9000 + 1000);
+        while (frequencyManager.getFrequency(base) != null) {
+            base = type + "-" + (int)(Math.random() * 9000 + 1000);
         }
-    }
-
-    /**
-     * Extrae el nombre de la frecuencia del item
-     */
-    private String extractFrequencyName(org.bukkit.inventory.ItemStack item) {
-        if (item == null || !item.hasItemMeta()) return null;
-
-        net.kyori.adventure.text.Component displayName = item.getItemMeta().displayName();
-        if (displayName == null) return null;
-
-        // Convertir Component a String plano y remover códigos de color
-        String plainName = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(displayName);
-        return plainName.trim();
+        return base;
     }
 }
