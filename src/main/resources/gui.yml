@@ -7,98 +7,67 @@ global:
   default_size: 27
   enable_sounds: true
 
-# Menú Principal
-main_menu:
-  title: "&bMain Menu"
+# Airwave Connect Menu (FM/AM Selection)
+connect_menu:
+  title: "<aqua>Airwave Connect"
   size: 27
   
-  frequencies_button:
+  fm_button:
     slot: 11
     material: "ORANGE_WOOL"
+    name: "<gold>FM Band"
     lore:
-      - "&7All available frequencies"
-      - "&eClick to browse"
+      - "<gray>Range: 100.0 - 199.9 MHz"
+      - "<gray>Distance: 40 blocks"
+      - "<yellow>Click to browse FM"
   
-  favorites_button:
-    slot: 13
-    material: "GOLD_BLOCK"
+  am_button:
+    slot: 15
+    material: "YELLOW_WOOL"
+    name: "<gold>AM Band"
     lore:
-      - "&7Your saved frequencies"
-      - "&eClick to view favorites"
-  
-  stats_button:
-    slot: 14
-    material: "DIAMOND_BLOCK"
-    lore:
-      - "&7Network statistics"
-      - "&eClick to view stats"
-  
-  info_button:
-    slot: 16
-    material: "BOOK"
-    lore:
-      - "&7Plugin information"
-      - "&eClick for info"
+      - "<gray>Range: 1000 - 1999 kHz"
+      - "<gray>Distance: 100 blocks"
+      - "<yellow>Click to browse AM"
 
-# Menú de Frecuencias
-frequencies_menu:
-  title: "&bFrequencies - Page %page%"
+# Channels Menu (Frequency List)
+channels_menu:
+  title: "<aqua>Channels - %band%"
   size: 54
-  items_per_page: 36
-  frequency_material: "ORANGE_WOOL"
   
-  prev_button:
-    slot: 45
-    material: "ARROW"
-    lore:
-      - "&7Previous page"
-      - "&eClick to go back"
+  free_material: "GREEN_WOOL"
+  free_name: "<green>%frequency%"
   
-  next_button:
-    slot: 53
-    material: "ARROW"
-    lore:
-      - "&7Next page"
-      - "&eClick to continue"
+  occupied_material: "ORANGE_WOOL"
+  occupied_name: "<yellow>%frequency% <gray>(%listeners%)"
+  
+  encrypted_material: "BLACK_WOOL"
+  encrypted_name: "<dark_red>%frequency% <dark_gray>[Encrypted]"
   
   back_button:
     slot: 49
     material: "BARRIER"
-    lore:
-      - "&7Back to main menu"
+    name: "<red>Back"
 
-# Menú de Favoritos
-favorites_menu:
-  title: "&bYour Favorites"
+# Claim Frequency Menu
+claim_menu:
+  title: "<red>Claim Frequency"
   size: 27
-  frequency_material: "GOLD_BLOCK"
   
-  back_button:
-    slot: 26
-    material: "BARRIER"
+  fm_claim:
+    slot: 11
+    material: "ORANGE_WOOL"
+    name: "<gold>Create FM"
     lore:
-      - "&7Back to main menu"
-
-# Menú de Estadísticas
-stats_menu:
-  title: "&bStatistics"
-  size: 27
-  stats_material: "DIAMOND_BLOCK"
+      - "<gray>Cost: 32 redstone blocks"
+      - "<gray>      8 netherite ingots"
+      - "<yellow>Click to create"
   
-  back_button:
-    slot: 26
-    material: "BARRIER"
+  am_claim:
+    slot: 15
+    material: "YELLOW_WOOL"
+    name: "<gold>Create AM"
     lore:
-      - "&7Back to main menu"
-
-# Menú de Información
-info_menu:
-  title: "&bPlugin Information"
-  size: 27
-  info_material: "BOOK"
-  
-  back_button:
-    slot: 26
-    material: "BARRIER"
-    lore:
-      - "&7Back to main menu"
+      - "<gray>Cost: 32 redstone blocks"
+      - "<gray>      8 netherite ingots"
+      - "<yellow>Click to create"
