@@ -49,7 +49,7 @@ public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             Player player = (Player) sender;
-            plugin.getGUIManager().openMainMenu(player);
+            plugin.getGUIManager().openConnectMenu(player);
             return true;
         }
         if (args[0].equalsIgnoreCase("about")) {
