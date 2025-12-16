@@ -1,0 +1,58 @@
+messages:
+  reload:
+    success: "<green>Configuración recargada exitosamente."
+    fail: "<red>Error al recargar la configuración. Revisa los registros."
+  connect:
+    success: "<green>Conectado a la frecuencia <#00FFAA>{type}</#00FFAA> <yellow>{frequency}</yellow>."
+    not_found: "<red>La frecuencia {frequency} no existe para el tipo {type}."
+    invalid_type: "<red>El tipo debe ser FM o AM. Ejemplo: /connect FM 101.1"
+    cooldown_active: "<red>Espera antes de conectarte de nuevo."
+    usage: "<yellow>Uso: /connect FM/AM [frecuencia]"
+  disconnect:
+    success: "<gray>Desconectado de la frecuencia actual."
+    not_connected: "<red>No estás conectado a ninguna frecuencia."
+    cooldown_active: "<red>Espera antes de desconectarte de nuevo."
+    usage: "<yellow>Uso: /disconnect"
+  frequencies:
+    usage: "<yellow>Uso: /frequencies list FM/AM [página]"
+    list_header: "<aqua>Frecuencias disponibles:"
+    list_row: "<gray>{name} <white>|</white> <gray>{type} <white>|</white> <yellow>{listeners} oyentes"
+    list_footer: "<gray>─────────────────────────"
+    list_empty: "<red>No hay frecuencias disponibles para este tipo."
+    invalid_page: "<red>Número de página inválido."
+    page_info: "<gray>Página {page} de {total_pages}"
+    no_listeners: "<gray>(vacío)"
+    info_current: "<aqua>Conectado a <#00FFAA>{frequency}</#00FFAA> <gray>{type}</gray>."
+    info_none: "<yellow>No estás conectado a ninguna frecuencia."
+    info_details: "<gray>Frecuencia <#00FFAA>{frequency}</#00FFAA> <gray>{type}</gray>: <yellow>{listeners} oyentes, {distance} bloques"
+    info_top: "<aqua>Frecuencias principales:"
+  chat:
+    format: "<gray>[<#00FFAA>{frequency}</#00FFAA> <white>{type}]</white> <green>{player}:</green> <white>{message}</white>"
+    error_length: "<red>Tu mensaje es demasiado largo."
+    muted: "<yellow>No puedes enviar mensajes. El chat está silenciado."
+    distance_limit: "<red>Mensaje no enviado—el receptor está demasiado lejos."
+    static_warning: "<gray>[<yellow>⚠</yellow>] Señal degradada a {distance} bloques..."
+  error:
+    internal: "<red>Error interno. Contacta a un administrador."
+    permission_denied: "<red>Permiso denegado."
+    unknown_command: "<red>Comando desconocido. Usa /airwavechat help."
+  permission:
+    no_permission: "<red>No tienes permiso para usar este comando."
+    admin_only: "<red>Este comando es solo para administradores."
+  player:
+    not_player: "<red>Este comando solo puede ser utilizado por jugadores."
+  help:
+    header: "<aqua>Ayuda de AirwaveChat:"
+    user_header: "<aqua>Comandos de Usuario:"
+    admin_header: "<yellow>Comandos de Administrador:"
+    menu_user:
+      - "<gray>/connect FM/AM [frecuencia] <white>- Conectarse a una frecuencia"
+      - "<gray>/disconnect <white>- Desconectarse de tu frecuencia"
+      - "<gray>/frequencies list FM/AM [página] <white>- Listar frecuencias disponibles"
+      - "<gray>/frequencies info <frequency> <white>- Información sobre una frecuencia"
+      - "<gray>/frequencies current <white>- Mostrar tu frecuencia actual"
+      - "<gray>/frequencies top <white>- Mostrar frecuencias principales"
+    menu_admin:
+      - "<yellow>/airwavechat reload <white>- Recargar configuración"
+      - "<gray>/airwavechat about <white>- Información del plugin"
+      - "<yellow>/airwavechat help <white>- Mostrar esta ayuda"

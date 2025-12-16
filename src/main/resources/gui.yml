@@ -1,0 +1,104 @@
+# AirwaveChat GUI Configuration
+# Configuración de interfaz gráfica para AirwaveChat
+
+# Configuración global de menús
+global:
+  default_material: "PAPER"
+  default_size: 27
+  enable_sounds: true
+
+# Menú Principal
+main_menu:
+  title: "&bMain Menu"
+  size: 27
+  
+  frequencies_button:
+    slot: 11
+    material: "ORANGE_WOOL"
+    lore:
+      - "&7All available frequencies"
+      - "&eClick to browse"
+  
+  favorites_button:
+    slot: 13
+    material: "GOLD_BLOCK"
+    lore:
+      - "&7Your saved frequencies"
+      - "&eClick to view favorites"
+  
+  stats_button:
+    slot: 14
+    material: "DIAMOND_BLOCK"
+    lore:
+      - "&7Network statistics"
+      - "&eClick to view stats"
+  
+  info_button:
+    slot: 16
+    material: "BOOK"
+    lore:
+      - "&7Plugin information"
+      - "&eClick for info"
+
+# Menú de Frecuencias
+frequencies_menu:
+  title: "&bFrequencies - Page %page%"
+  size: 54
+  items_per_page: 36
+  frequency_material: "ORANGE_WOOL"
+  
+  prev_button:
+    slot: 45
+    material: "ARROW"
+    lore:
+      - "&7Previous page"
+      - "&eClick to go back"
+  
+  next_button:
+    slot: 53
+    material: "ARROW"
+    lore:
+      - "&7Next page"
+      - "&eClick to continue"
+  
+  back_button:
+    slot: 49
+    material: "BARRIER"
+    lore:
+      - "&7Back to main menu"
+
+# Menú de Favoritos
+favorites_menu:
+  title: "&bYour Favorites"
+  size: 27
+  frequency_material: "GOLD_BLOCK"
+  
+  back_button:
+    slot: 26
+    material: "BARRIER"
+    lore:
+      - "&7Back to main menu"
+
+# Menú de Estadísticas
+stats_menu:
+  title: "&bStatistics"
+  size: 27
+  stats_material: "DIAMOND_BLOCK"
+  
+  back_button:
+    slot: 26
+    material: "BARRIER"
+    lore:
+      - "&7Back to main menu"
+
+# Menú de Información
+info_menu:
+  title: "&bPlugin Information"
+  size: 27
+  info_material: "BOOK"
+  
+  back_button:
+    slot: 26
+    material: "BARRIER"
+    lore:
+      - "&7Back to main menu"
