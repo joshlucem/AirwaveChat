@@ -5,6 +5,42 @@ All notable changes to AirwaveChat will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2025-12-06
+
+### Added
+- **GUI System**: Complete graphical interface for managing frequencies
+  - Main menu with navigation to all features
+  - Frequencies menu with pagination support
+  - Favorites menu for quick access to saved frequencies
+  - Statistics menu showing network information
+  - Information menu with plugin details
+- **GUI Configuration**: New `gui.yml` file for customizing all menus
+  - Configurable inventory sizes, titles, and materials
+  - Per-item slot positioning
+  - Support for custom colors and lore
+  - Sound effects configuration (ready for implementation)
+- **GUIManager**: Central manager class for all inventory operations
+  - Menu creation and caching
+  - Player page tracking for pagination
+  - Favorites storage and management
+- **GUIClickListener**: Event-driven inventory click handler
+  - Automatic menu routing based on title detection
+  - Shift+Click detection for favorites management
+  - Connect on regular click functionality
+- **New Commands**: 
+  - `/airwavechat gui` - Open main GUI menu
+  - `/airwavechat menu` - Alias for gui command
+
+### Changed
+- **AirwaveChatCommand**: Enhanced with GUI subcommands and improved tab completion
+- **Version**: Bumped to 1.0.3
+
+### Technical
+- New package: `com.joshlucem.airwavechat.gui` with GUIManager and GUIClickListener
+- Integrated GUI listener registration in plugin startup
+- Added gui.yml resource file loading in config reload process
+- GUI system fully externalized through configuration file
+
 ## [1.0.2] - 2025-12-06
 
 ### Added
