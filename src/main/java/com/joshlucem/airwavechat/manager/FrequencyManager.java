@@ -126,8 +126,10 @@ public class FrequencyManager {
                 type.equalsIgnoreCase("AM") ? amDefault : fmDefault);
             double distance = getConfigDouble(customSection, key + ".chat_distance",
                 type.equalsIgnoreCase("AM") ? amDistance : fmDistance);
-            
-            frequencies.put(key, new Frequency(String.valueOf(value), type, distance));
+
+            // Use the visible frequency value as the map key so commands/tab-complete can find it
+            String freqName = String.valueOf(value);
+            frequencies.put(freqName, new Frequency(freqName, type, distance));
         }
     }
 
