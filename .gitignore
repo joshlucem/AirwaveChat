@@ -36,3 +36,4 @@ Thumbs.db
 node_modules/
 
 dependency-reduced-pom.xml
+pom.xml
