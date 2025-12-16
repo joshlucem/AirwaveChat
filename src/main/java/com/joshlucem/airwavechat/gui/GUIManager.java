@@ -269,11 +269,11 @@ public class GUIManager {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(MessageUtil.color("§6" + frequency));
+            meta.displayName(MessageUtil.color("<gold>" + frequency));
             java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
-            lore.add(MessageUtil.color("§7Listeners: " + listeners));
-            lore.add(MessageUtil.color("§bClick to connect"));
-            lore.add(MessageUtil.color("§eShift-Click to favorite"));
+            lore.add(MessageUtil.color("<gray>Listeners: " + listeners));
+            lore.add(MessageUtil.color("<aqua>Click to connect"));
+            lore.add(MessageUtil.color("<yellow>Shift-Click to favorite"));
             meta.lore(lore);
             item.setItemMeta(meta);
         }
@@ -291,9 +291,9 @@ public class GUIManager {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(MessageUtil.color("§b" + name));
+            meta.displayName(MessageUtil.color("<aqua>" + name));
             java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
-            lore.add(MessageUtil.color("§a" + value));
+            lore.add(MessageUtil.color("<green>" + value));
             meta.lore(lore);
             item.setItemMeta(meta);
         }
@@ -311,9 +311,9 @@ public class GUIManager {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(MessageUtil.color("§d" + name));
+            meta.displayName(MessageUtil.color("<light_purple>" + name));
             java.util.List<net.kyori.adventure.text.Component> lore = new java.util.ArrayList<>();
-            lore.add(MessageUtil.color("§6" + value));
+            lore.add(MessageUtil.color("<gold>" + value));
             meta.lore(lore);
             item.setItemMeta(meta);
         }
