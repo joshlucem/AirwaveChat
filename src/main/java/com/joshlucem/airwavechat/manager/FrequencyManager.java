@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import com.joshlucem.airwavechat.AirwaveChat;
+import com.joshlucem.airwavechat.util.MessageUtil;
 
 /**
  * Manages frequency creation, player connections, and data persistence.
@@ -61,6 +62,7 @@ public class FrequencyManager {
     private final Map<String, Frequency> frequencies;
     private final Map<UUID, String> playerFrequency;
     private final Map<UUID, String> authorizedEncryptedAccess;
+    private final Map<UUID, Long> lastSwitch;
 
     public FrequencyManager(FileConfiguration config, AirwaveChat plugin) {
         if (plugin == null) throw new IllegalArgumentException("Plugin cannot be null");
@@ -70,6 +72,7 @@ public class FrequencyManager {
         this.frequencies = new ConcurrentHashMap<>();
         this.playerFrequency = new ConcurrentHashMap<>();
         this.authorizedEncryptedAccess = new ConcurrentHashMap<>();
+        this.lastSwitch = new ConcurrentHashMap<>();
         
         // Load frequencies from configuration
         loadFrequencies(config);
@@ -186,6 +189,19 @@ public class FrequencyManager {
         Frequency freq = frequencies.get(name);
         if (freq == null || !freq.type.equalsIgnoreCase(type)) return false;
 
+        // Cooldown check to prevent rapid hopping
+        int cooldownSec = Math.max(0, plugin.getConfig().getInt("options.connect_cooldown_seconds", 5));
+        if (cooldownSec > 0) {
+            long now = System.currentTimeMillis();
+            Long last = lastSwitch.get(player.getUniqueId());
+            if (last != null && (now - last) < (cooldownSec * 1000L)) {
+                long remainMs = (cooldownSec * 1000L) - (now - last);
+                long remain = (long) Math.ceil(remainMs / 1000.0);
+                player.sendMessage(MessageUtil.color("<yellow>Debes esperar " + remain + "s antes de cambiar de frecuencia."));
+                return false;
+            }
+        }
+
         // Encrypted check
         if (freq.isEncrypted()) {
             String auth = authorizedEncryptedAccess.get(player.getUniqueId());
@@ -209,6 +225,8 @@ public class FrequencyManager {
 
         // consume one-time authorization
         authorizedEncryptedAccess.remove(player.getUniqueId());
+        // record last switch time
+        lastSwitch.put(player.getUniqueId(), System.currentTimeMillis());
         
         return true;
     }
@@ -235,6 +253,8 @@ public class FrequencyManager {
                 dataManager.removePlayerFrequency(playerId);
             }
         }
+        // also update last switch time to enforce cooldown between reconnects
+        lastSwitch.put(playerId, System.currentTimeMillis());
     }
 
     /**
