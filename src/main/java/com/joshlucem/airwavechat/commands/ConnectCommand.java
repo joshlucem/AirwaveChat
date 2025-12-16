@@ -54,10 +54,12 @@ public class ConnectCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         Player player = (Player) sender;
+        // Open GUI when no arguments are provided
         if (args.length < 2) {
-            sender.sendMessage(MessageUtil.color(plugin.getMessage("connect.usage")));
+            plugin.getGUIManager().openConnectMenu(player);
             return true;
         }
+
         String type = args[0].toUpperCase();
         String frequency = args[1];
         if (!type.equals("AM") && !type.equals("FM")) {
