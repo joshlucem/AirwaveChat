@@ -47,44 +47,21 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         
         String subCommand = args[0].toLowerCase();
         
-        // Handle aliases
         switch (subCommand) {
-            case "l":
-                subCommand = "list";
-                break;
-            case "c":
-                subCommand = "current";
-                break;
-            case "i":
-                subCommand = "info";
-                break;
-            case "t":
-                subCommand = "top";
-                break;
-            case "s":
-                subCommand = "search";
-                break;
+            case "l": subCommand = "list"; break;
+            case "c": subCommand = "current"; break;
+            case "i": subCommand = "info"; break;
+            case "t": subCommand = "top"; break;
+            case "s": subCommand = "search"; break;
         }
         
         switch (subCommand) {
-            case "list":
-                handleList(player, args);
-                break;
-            case "current":
-                handleCurrent(player);
-                break;
-            case "info":
-                handleInfo(player, args);
-                break;
-            case "top":
-                handleTop(player);
-                break;
-            case "search":
-                handleSearch(player, args);
-                break;
-            default:
-                player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.usage")));
-                break;
+            case "list": handleList(player, args); break;
+            case "current": handleCurrent(player); break;
+            case "info": handleInfo(player, args); break;
+            case "top": handleTop(player); break;
+            case "search": handleSearch(player, args); break;
+            default: player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.usage"))); break;
         }
         
         return true;
@@ -94,7 +71,6 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         final String freqType;
         int page = 1;
         
-        // Parse: /frequencies list [AM/FM] [page]
         if (args.length >= 2) {
             String arg1 = args[1].toUpperCase();
             if (arg1.equals("AM") || arg1.equals("FM")) {
@@ -109,7 +85,6 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
                     }
                 }
             } else {
-                // Try to parse as page number
                 try {
                     page = Integer.parseInt(arg1);
                     if (page < 1) page = 1;
@@ -125,12 +100,10 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         
         java.util.List<FrequencyManager.Frequency> frequencies = new java.util.ArrayList<>(frequencyManager.getFrequencies());
         
-        // Filter by type
         if (freqType != null) {
             frequencies.removeIf(f -> !f.type.equalsIgnoreCase(freqType));
         }
         
-        // Sort by listener count (descending), then by name
         frequencies.sort(Comparator
             .comparingInt((FrequencyManager.Frequency f) -> f.listeners.size())
             .reversed()
@@ -156,14 +129,12 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         int start = (page - 1) * pageSize;
         int end = Math.min(start + pageSize, total);
         
-        // Build header
         String header = plugin.getMessage("frequencies.list_header");
         if (freqType != null) {
-            header += " <gray>(<yellow>" + freqType + "</yellow> only)";
+            header += plugin.getMessage("frequencies.list_filter_note").replace("{type}", freqType);
         }
         player.sendMessage(MessageUtil.color(header));
         
-        // List frequencies
         for (int i = start; i < end; i++) {
             FrequencyManager.Frequency freq = frequencies.get(i);
             String row = plugin.getMessage("frequencies.list_row")
@@ -177,19 +148,17 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
             player.sendMessage(MessageUtil.color(row));
         }
         
-        // Footer with pagination
         player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.list_footer")));
         String pageInfo = plugin.getMessage("frequencies.page_info")
             .replace("{page}", String.valueOf(page))
             .replace("{total_pages}", String.valueOf(pageCount));
         player.sendMessage(MessageUtil.color(pageInfo));
         
-        // Navigation hints
         if (page < pageCount) {
             String nextCmd = freqType != null ? 
                 "/frequencies list " + freqType + " " + (page + 1) :
                 "/frequencies list " + (page + 1);
-            player.sendMessage(MessageUtil.color("<gray>Next page: <yellow>" + nextCmd));
+            player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.list_next_page").replace("{command}", nextCmd)));
         }
     }
     
@@ -207,7 +176,7 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
     
     private void handleInfo(Player player, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(MessageUtil.color("<yellow>Usage: /frequencies info <frequency>"));
+            player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.info_usage")));
             return;
         }
         
@@ -215,7 +184,7 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         FrequencyManager.Frequency freq = frequencyManager.getFrequency(freqName);
         
         if (freq == null) {
-            player.sendMessage(MessageUtil.color("<red>Frequency not found."));
+            player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.info_not_found")));
             return;
         }
         
@@ -230,7 +199,6 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
     private void handleTop(Player player) {
         java.util.List<FrequencyManager.Frequency> frequencies = new java.util.ArrayList<>(frequencyManager.getFrequencies());
         
-        // Sort by listener count descending
         frequencies.sort((a, b) -> Integer.compare(b.listeners.size(), a.listeners.size()));
         
         player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.info_top")));
@@ -238,17 +206,20 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         int limit = Math.min(10, frequencies.size());
         for (int i = 0; i < limit; i++) {
             FrequencyManager.Frequency freq = frequencies.get(i);
-            if (freq.listeners.size() == 0) break; // Stop at empty frequencies
+            if (freq.listeners.size() == 0) break;
             
-            String row = "<gray>#" + (i + 1) + "</gray> <#00FFAA>" + freq.name + "</#00FFAA> <gray>" + 
-                         freq.type + "</gray> - <yellow>" + freq.listeners.size() + " listeners</yellow>";
+            String row = plugin.getMessage("frequencies.top_row")
+                .replace("{rank}", String.valueOf(i + 1))
+                .replace("{name}", freq.name)
+                .replace("{type}", freq.type)
+                .replace("{listeners}", String.valueOf(freq.listeners.size()));
             player.sendMessage(MessageUtil.color(row));
         }
     }
     
     private void handleSearch(Player player, String[] args) {
         if (args.length < 2) {
-            player.sendMessage(MessageUtil.color("<yellow>Usage: /frequencies search <query>"));
+            player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.search_usage")));
             return;
         }
         
@@ -262,14 +233,13 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         }
         
         if (matches.isEmpty()) {
-            player.sendMessage(MessageUtil.color("<red>No frequencies found matching '<yellow>" + query + "</yellow>'."));
+            player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.search_no_results").replace("{query}", query)));
             return;
         }
         
-        // Sort by listener count
         matches.sort((a, b) -> Integer.compare(b.listeners.size(), a.listeners.size()));
         
-        player.sendMessage(MessageUtil.color("<aqua>Search results for '<yellow>" + query + "</yellow>':"));
+        player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.search_header").replace("{query}", query)));
         
         int limit = Math.min(15, matches.size());
         for (int i = 0; i < limit; i++) {
@@ -282,7 +252,7 @@ public class FrequenciesCommand implements CommandExecutor, TabCompleter {
         }
         
         if (matches.size() > limit) {
-            player.sendMessage(MessageUtil.color("<gray>... and " + (matches.size() - limit) + " more results."));
+            player.sendMessage(MessageUtil.color(plugin.getMessage("frequencies.search_more_results").replace("{count}", String.valueOf(matches.size() - limit))));
         }
     }
 }

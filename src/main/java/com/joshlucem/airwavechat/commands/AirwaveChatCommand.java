@@ -4,16 +4,17 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 
 import com.joshlucem.airwavechat.AirwaveChat;
 import com.joshlucem.airwavechat.util.MessageUtil;
 
 public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
     private final AirwaveChat plugin;
+
     public AirwaveChatCommand(AirwaveChat plugin) {
         this.plugin = plugin;
     }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
@@ -30,6 +31,7 @@ public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
             }
             return true;
         }
+
         if (args[0].equalsIgnoreCase("reload")) {
             if (!sender.hasPermission("airwavechat.admin")) {
                 sender.sendMessage(MessageUtil.color(plugin.getMessage("permission.no_permission")));
@@ -43,22 +45,17 @@ public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
             }
             return true;
         }
-        if (args[0].equalsIgnoreCase("gui") || args[0].equalsIgnoreCase("menu")) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(MessageUtil.color("<red>This command is only for players!</red>"));
-                return true;
-            }
-            Player player = (Player) sender;
-            plugin.getGUIManager().openConnectMenu(player);
+
+        if (args[0].equalsIgnoreCase("about")) {
+            String version = plugin.getDescription().getVersion();
+            String name = plugin.getDescription().getName();
+            String description = plugin.getMessage("about.description");
+            
+            sender.sendMessage(MessageUtil.color("<aqua>" + name + " v" + version + "</aqua>"));
+            sender.sendMessage(MessageUtil.color(description));
             return true;
         }
-        if (args[0].equalsIgnoreCase("about")) {
-            sender.sendMessage(MessageUtil.color(
-                "<aqua>AirwaveChat by @joshlucem. Version: " + 
-                plugin.getPluginMeta().getVersion() + 
-                "</aqua>"));           
-                 return true;
-        }
+
         sender.sendMessage(MessageUtil.color(plugin.getMessage("error.unknown_command")));
         return true;
     }
@@ -68,10 +65,10 @@ public class AirwaveChatCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             java.util.List<String> subs = new java.util.ArrayList<>();
             subs.add("help");
-            subs.add("gui");
-            subs.add("menu");
-            if (sender.hasPermission("airwavechat.admin")) subs.add("reload");
             subs.add("about");
+            if (sender.hasPermission("airwavechat.admin")) {
+                subs.add("reload");
+            }
             return subs;
         }
         return java.util.Collections.emptyList();

@@ -14,20 +14,18 @@ public class DisconnectCommand implements CommandExecutor, TabCompleter {
     private final FrequencyManager frequencyManager;
     private final AirwaveChat plugin;
     private final java.util.HashMap<java.util.UUID, Long> cooldowns = new java.util.HashMap<>();
-    private long COOLDOWN_MILLIS = 2000; // fallback
+    private long cooldownMillis = 2000;
 
     public DisconnectCommand(FrequencyManager frequencyManager, AirwaveChat plugin) {
         this.frequencyManager = frequencyManager;
         this.plugin = plugin;
-        // Read cooldown from config options.cooldown_disconnect (seconds)
         int seconds = plugin.getConfig().getInt("options.cooldown_disconnect", 2);
         if (seconds < 0) seconds = 0;
-        this.COOLDOWN_MILLIS = seconds * 1000L;
+        this.cooldownMillis = seconds * 1000L;
     }
 
     @Override
     public java.util.List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        // No tab completion needed for /disconnect
         return java.util.Collections.emptyList();
     }
 
@@ -47,7 +45,7 @@ public class DisconnectCommand implements CommandExecutor, TabCompleter {
         long now = System.currentTimeMillis();
         if (cooldowns.containsKey(player.getUniqueId())) {
             long last = cooldowns.get(player.getUniqueId());
-            if (now - last < COOLDOWN_MILLIS) {
+            if (now - last < cooldownMillis) {
                 sender.sendMessage(MessageUtil.color(plugin.getMessage("disconnect.cooldown_active")));
                 return true;
             }
@@ -57,13 +55,11 @@ public class DisconnectCommand implements CommandExecutor, TabCompleter {
         frequencyManager.disconnect(player);
         sender.sendMessage(MessageUtil.color(plugin.getMessage("disconnect.success")));
         
-        // Play disconnect sound
         if (plugin.getConfig().getBoolean("options.enable_sounds", true)) {
             String soundName = plugin.getConfig().getString("options.sound_disconnect", "block.note_block.bass");
             try {
                 player.playSound(player.getLocation(), org.bukkit.Sound.valueOf(soundName.toUpperCase().replace(".", "_")), 1.0f, 0.5f);
             } catch (IllegalArgumentException e) {
-                // Invalid sound, skip
             }
         }
         

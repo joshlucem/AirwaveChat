@@ -1,67 +1,46 @@
-# AirwaveChat configuration
-
-# Frequency settings
 frequencies:
-  allow_custom: true                  # Allow custom frequencies
+  allow_custom: true
   fm:
-    min: 100.0                        # FM minimum frequency
-    max: 199.9                        # FM maximum frequency
-    step: 0.1                         # FM frequency increment
-    default: 101.1                    # Default FM frequency
-    chat_distance: 40.0               # FM chat distance (blocks)
-    max_count: 1000                   # Max FM frequencies generated
+    min: 100.0
+    max: 199.9
+    step: 0.1
+    default: 101.1
+    chat_distance: 40.0
+    max_count: 1000
   am:
-    min: 1000                         # AM minimum frequency
-    max: 1999                         # AM maximum frequency
-    step: 1                           # AM frequency increment
-    default: 1000                     # Default AM frequency
-    chat_distance: 100.0              # AM chat distance (blocks)
-    max_count: 1000                   # Max AM frequencies generated
+    min: 1000
+    max: 1999
+    step: 1
+    default: 1000
+    chat_distance: 100.0
+    max_count: 1000
   custom:
     Police:
-      type: "FM"                      # Custom frequency type
-      frequency: 123                 # Custom frequency value
-      chat_distance: 60.0             # Custom chat distance
+      type: "FM"
+      frequency: 123.0
+      chat_distance: 60.0
     Emergency:
       type: "AM"
-      frequency: 456                  # Custom frequency value
-      chat_distance: 120.0             # Custom chat distance
-    # Example: add more custom channels below
-    # Taxi:
-    #   type: "FM"
-    #   chat_distance: 50.0
+      frequency: 456
+      chat_distance: 120.0
 
-# General options
 options:
-  language: "en"                      # Language: en, es, pt
-  show_join_message: true             # Show message when connecting
-  show_disconnect_message: true       # Show message when disconnecting
-  enable_proximity: true              # Enable proximity chat
-  max_message_length: 256             # Maximum chat message length
-  cooldown_connect: 2                 # Seconds cooldown between connects
-  cooldown_disconnect: 2              # Seconds cooldown between disconnects
-  enable_static: true                 # Enable static/distortion effect with distance
-  static_threshold: 0.75              # Distance % where static starts (0.0-1.0)
-  static_intensity: 0.5               # Static intensity multiplier (0.0-1.0)
-  enable_signal_bar: true             # Show signal strength in action bar
-  signal_update_interval: 20          # Ticks between signal updates (20 = 1 second)
-  enable_sounds: true                 # Enable radio sound effects
-  sound_connect: "block.note_block.pling"  # Sound on connect
-  sound_disconnect: "block.note_block.bass" # Sound on disconnect
-  sound_static: "entity.experience_orb.pickup" # Sound with static messages
-  connect_cooldown_seconds: 5         # Cooldown between frequency switches (0 = disabled)
-  passcode_max_attempts: 3            # Max passcode attempts before lockout
-  passcode_lockout_seconds: 30        # Lockout duration after max attempts
+  show_join_message: true
+  show_disconnect_message: true
+  enable_proximity: true
+  max_message_length: 256
+  cooldown_connect: 2
+  cooldown_disconnect: 2
+  enable_static: true
+  static_threshold: 0.75
+  static_intensity: 0.5
+  enable_signal_bar: true
+  signal_update_interval: 20
+  enable_sounds: true
+  sound_connect: "block.note_block.pling"
+  sound_disconnect: "block.note_block.bass"
+  sound_static: "entity.experience_orb.pickup"
+  connect_cooldown_seconds: 5
 
-# Advanced settings
 advanced:
-  debug_mode: false                   # Enable debug mode
-  persist_custom_frequencies: true    # Save/restore custom frequencies across restarts
-  custom_frequency_cost:              # Resource cost to create custom frequency
-    redstone_blocks: 32               # Redstone blocks required
-    netherite_ingots: 8               # Netherite ingots required
-  frequency_auto_cleanup:
-    enabled: false                    # Auto-remove inactive custom frequencies
-    inactivity_days: 7                # Days before removal
-
-# End of configuration file
+  debug_mode: false

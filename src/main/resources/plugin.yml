@@ -1,11 +1,12 @@
 main: com.joshlucem.airwavechat.AirwaveChat
 name: AirwaveChat
-version: 1.0.3
+version: 2.0.0
 api-version: 1.20
 folia-supported: true
 authors: [joshlucem]
 website: https://github.com/joshlucem/AirwaveChat
-description: Realistic radio communication plugin with proximity chat, signal degradation, and frequency-based channels for Paper/Spigot servers.
+description: Radio communication plugin with proximity chat, signal degradation and FM/AM frequency-based channels for Paper/Spigot servers.
+
 commands:
   connect:
     description: Connect to a frequency.
@@ -23,16 +24,16 @@ commands:
     aliases: [freq, freqs, f]
     permission: airwavechat.user
   airwavechat:
-    description: Main command for AirwaveChat.
+    description: Main AirwaveChat command.
     usage: /airwavechat <reload|about|help>
     aliases: [awc, airchat]
     permission: airwavechat.admin
 
 permissions:
   airwavechat.user:
-    description: Allows use of AirwaveChat user commands
+    description: Allows using AirwaveChat user commands
     default: true
   airwavechat.admin:
-    description: Allows use of AirwaveChat admin commands
+    description: Allows using AirwaveChat administrator commands
     default: op
-  
+

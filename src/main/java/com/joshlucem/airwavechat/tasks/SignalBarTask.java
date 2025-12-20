@@ -1,7 +1,6 @@
 package com.joshlucem.airwavechat.tasks;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -32,7 +31,6 @@ public class SignalBarTask extends BukkitRunnable {
             FrequencyManager.Frequency freq = frequencyManager.getPlayerFrequency(player);
             if (freq == null) continue;
 
-            // Find nearest player on same frequency
             double nearestDistance = Double.MAX_VALUE;
             for (Player other : player.getWorld().getPlayers()) {
                 if (other.equals(player)) continue;
@@ -45,14 +43,12 @@ public class SignalBarTask extends BukkitRunnable {
             }
 
             if (nearestDistance == Double.MAX_VALUE) {
-                // No one else on frequency
                 player.sendActionBar(Component.text("📻 ", NamedTextColor.GRAY)
                     .append(Component.text(freq.name + " " + freq.type, NamedTextColor.AQUA))
-                    .append(Component.text(" | No signal", NamedTextColor.DARK_GRAY)));
+                    .append(Component.text(" | " + plugin.getMessage("signal.no_signal"), NamedTextColor.DARK_GRAY)));
                 continue;
             }
 
-            // Calculate signal strength
             double ratio = StaticUtil.calculateDistanceRatio(nearestDistance, freq.chatDistance);
             int bars = getSignalBars(ratio);
             TextColor color = getSignalColor(bars);

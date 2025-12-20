@@ -12,93 +12,48 @@ import org.bukkit.entity.Player;
 import com.joshlucem.airwavechat.AirwaveChat;
 import com.joshlucem.airwavechat.util.MessageUtil;
 
-/**
- * Manages frequency creation, player connections, and data persistence.
- * Thread-safe using ConcurrentHashMap for concurrent access.
- */
 public class FrequencyManager {
     private final AirwaveChat plugin;
     
-    /**
-     * Represents a radio frequency with listener tracking.
-     */
     public static class Frequency {
         public final String name;
-        public final String type; // AM or FM
+        public final String type;
         public final double chatDistance;
         public final Set<UUID> listeners;
-        private boolean encrypted;
-        private String passcode;
-        private UUID owner;
 
         public Frequency(String name, String type, double chatDistance) {
             this.name = name;
             this.type = type;
             this.chatDistance = chatDistance;
             this.listeners = ConcurrentHashMap.newKeySet();
-            this.encrypted = false;
-        }
-
-        public boolean isEncrypted() {
-            return encrypted && passcode != null && !passcode.isEmpty();
-        }
-
-        public void setEncryption(UUID owner, String passcode) {
-            this.owner = owner;
-            this.passcode = passcode;
-            this.encrypted = passcode != null && !passcode.isEmpty();
-        }
-
-        public boolean checkPasscode(String candidate) {
-            if (!isEncrypted()) return true;
-            return passcode != null && passcode.equals(candidate);
-        }
-
-        public UUID getOwner() {
-            return owner;
         }
     }
 
     private final Map<String, Frequency> frequencies;
     private final Map<UUID, String> playerFrequency;
-    private final Map<UUID, String> authorizedEncryptedAccess;
     private final Map<UUID, Long> lastSwitch;
 
     public FrequencyManager(FileConfiguration config, AirwaveChat plugin) {
-        if (plugin == null) throw new IllegalArgumentException("Plugin cannot be null");
-        if (config == null) throw new IllegalArgumentException("Config cannot be null");
+        if (plugin == null) throw new IllegalArgumentException("Plugin no puede ser nulo");
+        if (config == null) throw new IllegalArgumentException("Config no puede ser nulo");
         
         this.plugin = plugin;
         this.frequencies = new ConcurrentHashMap<>();
         this.playerFrequency = new ConcurrentHashMap<>();
-        this.authorizedEncryptedAccess = new ConcurrentHashMap<>();
         this.lastSwitch = new ConcurrentHashMap<>();
         
-        // Load frequencies from configuration
         loadFrequencies(config);
     }
 
-    /**
-     * Load all frequencies from configuration efficiently.
-     */
     private void loadFrequencies(FileConfiguration config) {
         boolean allowCustom = config.getBoolean("frequencies.allow_custom", true);
-        
-        // Load FM frequencies
         loadFMFrequencies(config);
-        
-        // Load AM frequencies
         loadAMFrequencies(config);
-        
-        // Load custom frequencies
         if (allowCustom) {
             loadCustomFrequencies(config);
         }
     }
 
-    /**
-     * Load FM frequencies from config.
-     */
     private void loadFMFrequencies(FileConfiguration config) {
         double fmMin = config.getDouble("frequencies.fm.min", 100.0);
         double fmMax = config.getDouble("frequencies.fm.max", 199.9);
@@ -114,9 +69,6 @@ public class FrequencyManager {
         }
     }
 
-    /**
-     * Load AM frequencies from config.
-     */
     private void loadAMFrequencies(FileConfiguration config) {
         int amMin = config.getInt("frequencies.am.min", 1000);
         int amMax = config.getInt("frequencies.am.max", 1999);
@@ -132,9 +84,6 @@ public class FrequencyManager {
         }
     }
 
-    /**
-     * Load custom frequencies from config.
-     */
     private void loadCustomFrequencies(FileConfiguration config) {
         if (!config.isConfigurationSection("frequencies.custom")) {
             return;
@@ -155,15 +104,11 @@ public class FrequencyManager {
             double distance = getConfigDouble(customSection, key + ".chat_distance",
                 type.equalsIgnoreCase("AM") ? amDistance : fmDistance);
 
-            // Use the visible frequency value as the map key so commands/tab-complete can find it
             String freqName = String.valueOf(value);
             frequencies.put(freqName, new Frequency(freqName, type, distance));
         }
     }
 
-    /**
-     * Safely get a double from config with fallback.
-     */
     private double getConfigDouble(org.bukkit.configuration.ConfigurationSection section, String path, double fallback) {
         if (section.contains(path) && section.get(path) instanceof Number) {
             return section.getDouble(path);
@@ -179,17 +124,12 @@ public class FrequencyManager {
         return frequencies.get(name);
     }
 
-    /**
-     * Connect a player to a frequency.
-     * Thread-safe and persistent.
-     */
     public boolean connect(Player player, String name, String type) {
         if (player == null || name == null || type == null) return false;
         
         Frequency freq = frequencies.get(name);
         if (freq == null || !freq.type.equalsIgnoreCase(type)) return false;
 
-        // Cooldown check to prevent rapid hopping
         int cooldownSec = Math.max(0, plugin.getConfig().getInt("options.connect_cooldown_seconds", 5));
         if (cooldownSec > 0) {
             long now = System.currentTimeMillis();
@@ -197,44 +137,26 @@ public class FrequencyManager {
             if (last != null && (now - last) < (cooldownSec * 1000L)) {
                 long remainMs = (cooldownSec * 1000L) - (now - last);
                 long remain = (long) Math.ceil(remainMs / 1000.0);
-                player.sendMessage(MessageUtil.color("<yellow>Debes esperar " + remain + "s antes de cambiar de frecuencia."));
-                return false;
-            }
-        }
-
-        // Encrypted check
-        if (freq.isEncrypted()) {
-            String auth = authorizedEncryptedAccess.get(player.getUniqueId());
-            if (auth == null || !auth.equals(name)) {
+                player.sendMessage(MessageUtil.color("<yellow>Debes esperar " + remain + "s antes de cambiar de frecuencia.</yellow>"));
                 return false;
             }
         }
         
-        // Disconnect from current frequency first
         disconnect(player);
         
-        // Connect to new frequency
         freq.listeners.add(player.getUniqueId());
         playerFrequency.put(player.getUniqueId(), name);
         
-        // Persist connection
         DataManager dataManager = plugin.getDataManager();
         if (dataManager != null) {
             dataManager.savePlayerFrequency(player.getUniqueId(), name);
         }
 
-        // consume one-time authorization
-        authorizedEncryptedAccess.remove(player.getUniqueId());
-        // record last switch time
         lastSwitch.put(player.getUniqueId(), System.currentTimeMillis());
         
         return true;
     }
 
-    /**
-     * Disconnect a player from their current frequency.
-     * Thread-safe and persistent.
-     */
     public void disconnect(Player player) {
         if (player == null) return;
         
@@ -247,40 +169,18 @@ public class FrequencyManager {
                 freq.listeners.remove(playerId);
             }
             
-            // Remove from persistent storage
             DataManager dataManager = plugin.getDataManager();
             if (dataManager != null) {
                 dataManager.removePlayerFrequency(playerId);
             }
         }
-        // also update last switch time to enforce cooldown between reconnects
         lastSwitch.put(playerId, System.currentTimeMillis());
     }
 
-    /**
-     * Get the frequency a player is currently connected to.
-     */
     public Frequency getPlayerFrequency(Player player) {
         if (player == null) return null;
         
         String freqName = playerFrequency.get(player.getUniqueId());
         return freqName != null ? frequencies.get(freqName) : null;
-    }
-
-    /**
-     * Authorize a player for a single encrypted connection attempt.
-     */
-    public void authorizeEncryptedAccess(UUID playerId, String frequencyName) {
-        authorizedEncryptedAccess.put(playerId, frequencyName);
-    }
-
-    /**
-     * Create a custom frequency dynamically (used for claimed nodes).
-     */
-    public Frequency createCustomFrequency(String name, String type, double distance, UUID owner, String passcode) {
-        Frequency f = new Frequency(name, type, distance);
-        f.setEncryption(owner, passcode);
-        frequencies.put(name, f);
-        return f;
     }
 }
