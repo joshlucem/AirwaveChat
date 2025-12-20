@@ -5,6 +5,173 @@ All notable changes to AirwaveChat will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-12-19
+
+### 🎯 Major Refactorization - Stable Release
+
+This version represents a complete refactorization of AirwaveChat, focusing on stability, performance, and production readiness. All experimental features have been removed in favor of a clean, reliable codebase.
+
+### Added
+- **Centralized Messages System**: All user-facing text now loaded from `messages.yml`
+  - No hardcoded strings in Java classes
+  - Easy customization without recompilation
+  - Consistent message formatting
+- **Enhanced Message Keys**: New message keys for better granularity
+  - `frequencies.list_filter_note` - Type filter indicator
+  - `frequencies.list_next_page` - Pagination navigation
+  - `frequencies.info_usage` - Info command usage
+  - `frequencies.info_not_found` - Frequency not found error
+  - `frequencies.search_*` - Complete search command messages
+  - `frequencies.top_row` - Top frequencies row format
+  - `signal.no_signal` - No signal indicator
+  - `about.*` - About command messages
+  - `error.save_data_error` - Data saving error message
+- **English-Only Interface**: All messages, commands, and documentation in English
+  - Clean, professional communication
+  - Consistent terminology throughout
+  - Easy to understand for international audience
+
+### Removed
+- **GUI System**: Removed all inventory-based GUIs
+  - Deleted `GUIManager.java`
+  - Deleted `GUIClickListener.java`
+  - Deleted `gui.yml` configuration
+  - Removed `/airwavechat gui` and `/airwavechat menu` commands
+- **Structure System**: Removed automatic structure creation
+  - Deleted `StructureInteractListener.java`
+  - Removed all structure-related configuration
+- **Encryption System**: Removed frequency encryption/passcode feature
+  - Deleted `PasscodeListener.java`
+  - Removed encryption logic from `FrequencyManager`
+  - Removed `authorizedEncryptedAccess` map
+  - Removed `createCustomFrequency` method
+- **Multi-language Support**: Removed language switching system
+  - Deleted `messages_en.yml`, `messages_es.yml`, `messages_pt.yml`
+  - Deleted `messages/` directory
+  - Removed language selection from config
+  - Single `messages.yml` file in English
+- **Build Artifacts**: Removed unnecessary files
+  - Deleted `dependency-reduced-pom.xml` from repository
+
+### Changed
+- **All Messages to English**: Converted from Spanish to English
+  - Command descriptions in `plugin.yml`
+  - Permission descriptions
+  - All user-facing messages in `messages.yml`
+  - Action bar notifications
+  - Error messages
+- **Improved Message Formatting**: Better user experience
+  - "Connected to FM 103.5" instead of generic messages
+  - "Signal Strength: ███░░ (72%)" for action bar
+  - Clear, friendly error messages
+  - Consistent formatting across all commands
+- **Code Clean-up**: Removed all code comments
+  - Cleaner, more readable code
+  - Self-documenting method names
+  - Reduced file sizes
+- **FrequenciesCommand**: Complete refactor
+  - All hardcoded text replaced with message keys
+  - Improved pagination system
+  - Better search functionality
+  - Consistent message formatting
+- **AirwaveChatCommand**: Simplified
+  - About command now uses message keys
+  - Removed GUI-related code
+- **SignalBarTask**: English interface
+  - "No Signal" instead of "Sin señal"
+  - Uses message key from config
+- **DataManager**: Error messages from config
+  - Save errors now use message keys
+  - Better error reporting
+
+### Fixed
+- **Cross-World Communication Bug**: Players in different worlds can no longer communicate
+  - Added world equality check in `FrequencyChatListener`
+- **Null Pointer Exceptions**: Comprehensive null validation
+  - Location null checks
+  - World validation before distance calculation
+  - Frequency existence validation
+- **Memory Leaks**: Improved cleanup
+  - Player references properly removed on disconnect
+  - Frequency listeners set cleaned up
+- **Thread Safety**: Enhanced concurrent operations
+  - ConcurrentHashMap for all shared data
+  - Thread-safe listener management
+  - Async I/O for file operations
+- **Race Conditions**: Fixed synchronization issues
+  - Proper locking in frequency operations
+  - Thread-safe player frequency tracking
+
+### Performance
+- **Reduced Memory Footprint**: Removed unused features and code
+- **Faster Message Processing**: Direct message key lookup
+- **Optimized Proximity Calculations**: Better distance checking
+- **Improved Scheduler Usage**: Better Folia detection and support
+
+### Security
+- **Removed Attack Vectors**: Eliminated encryption system vulnerabilities
+- **Input Validation**: Better command argument validation
+- **Error Handling**: Comprehensive exception catching
+
+### Documentation
+- **README.md**: Updated with v2.0.0 features (English)
+- **CHANGELOG.md**: Complete version history (English)
+- **Code Comments**: Removed for cleaner code
+- **Self-Documenting**: Clear method and variable names
+
+### Migration from 1.0.3
+
+**Breaking Changes:**
+1. GUIs no longer available - use commands instead
+2. Encryption/passcodes removed - frequencies are public
+3. Structure creation removed
+4. Multi-language support removed - English only
+5. Custom frequency creation requires manual config edit
+
+**Configuration:**
+- Remove `options.language` from config.yml
+- Remove any GUI-related settings
+- Remove encryption/passcode settings
+- Keep existing frequency configuration (still compatible)
+
+**Messages:**
+- Replace `messages_*.yml` files with single `messages.yml`
+- All messages now in English
+- New message keys available for customization
+
+**Commands:**
+- `/airwavechat gui` - REMOVED (use regular commands)
+- `/airwavechat menu` - REMOVED (use regular commands)
+- All other commands work the same
+
+**Update Procedure:**
+1. Backup your server
+2. Stop the server
+3. Replace AirwaveChat-1.0.3.jar with AirwaveChat-2.0.0.jar
+4. Delete old `messages_*.yml` files
+5. Review and update `config.yml` (remove obsolete options)
+6. Start server
+7. Test basic functionality
+8. Customize `messages.yml` if needed
+
+### Version Philosophy
+
+v2.0.0 is a **stable release** with **no plans for new features**. The focus is on:
+- ✅ Reliability and stability
+- ✅ Performance optimization  
+- ✅ Clean, maintainable code
+- ✅ Production-ready quality
+- ❌ No experimental features
+- ❌ No breaking changes planned
+- ❌ Minimal maintenance mode
+
+Future updates will only address:
+- Critical bug fixes
+- Security patches
+- Minecraft version compatibility
+
+---
+
 ## [1.0.3] - 2025-12-06
 
 ### Added
